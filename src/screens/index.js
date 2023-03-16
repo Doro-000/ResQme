@@ -5,8 +5,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../firebaseConfig";
 
 import { useEffect, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Text } from "react-native-paper";
+import { View, Text } from "react-native";
 
 export default function RootNavigator() {
   const [uid, setUid] = useState(null);
@@ -26,9 +25,15 @@ export default function RootNavigator() {
 
   if (loading) {
     return (
-      <SafeAreaView>
-        <Text>loading...</Text>
-      </SafeAreaView>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Text>Loading...</Text>
+      </View>
     );
   }
 

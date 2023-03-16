@@ -10,6 +10,6 @@ export default locationStore = {
     if (isEmpty(state.location)) {
       return "";
     }
-    return `Longitude: ${state.location?.coords.longitude} \nLatitude: ${state.location?.coords.latitude} `;
+    return `Longitude: ${state.location?.longitude} \nLatitude: ${state.location?.latitude} `;
   }),
 };

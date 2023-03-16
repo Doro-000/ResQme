@@ -1,61 +1,72 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // UI
-import { Text, View, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { Button } from "react-native-paper";
 
-// STORE
-import { useStoreState, useStoreActions } from "easy-peasy";
+import { Audio } from "expo-av";
 
-// LOCATION
-import * as Location from "expo-location";
+import Map from "../common/map";
 
 export default function HomeScreen() {
-  const setLocation = useStoreActions((actions) => actions.setLocation);
-  const location = useStoreState((state) => state.getLocationText);
-
-  const user = useStoreState((state) => state.user);
-
+  const [sound, setSound] = useState(null);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
 
-  const getLocation = async () => {
+  async function playSound() {
     setLoading(true);
+    const { granted } = await Audio.requestPermissionsAsync();
+    console.log(granted);
 
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
+    if (!granted) {
       setLoading(false);
-      setErrorMsg("Permission to access location was denied");
+      setErrorMsg("Permission to play audio was denied");
       return;
     }
 
     try {
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
+      const { sound } = await Audio.Sound.createAsync(
+        require("../../../assets/SOS_AUDIO.mp3"),
+        { shouldPlay: true }
+      );
+      setSound(sound);
     } catch (error) {
-      setErrorMsg("Couldn't fetch Location, try again !");
+      setErrorMsg("Couldn't play audio, try again !");
     } finally {
       setLoading(false);
     }
-  };
+  }
+
+  useEffect(() => {
+    return sound
+      ? () => {
+          console.log("Unloading Sound");
+          sound.unloadAsync();
+        }
+      : undefined;
+  }, [sound]);
 
   return (
     <View style={style.HomeScreen}>
       <View style={style.Content}>
-        <Text>{JSON.stringify(user)}</Text>
-        <Text> Press the Button to fetch location ! </Text>
-        <Text>{loading ? "Loading..." : location || errorMsg}</Text>
+        <Map />
       </View>
+
       <View style={style.ButtonCard}>
         <Button
           style={style.Button}
           icon="google-maps"
           mode="contained"
-          onPress={getLocation}
+          onPress={() => console.log("press")}
         >
           SOS
         </Button>
-        <Button mode="outlined" icon="bell" style={style.Button}>
+        <Button
+          mode="outlined"
+          icon="bell"
+          style={style.Button}
+          onPress={playSound}
+        >
           RING
         </Button>
       </View>
@@ -72,9 +83,6 @@ const style = StyleSheet.create({
   Content: {
     width: "98%",
     flex: 0.7,
-    backgroundColor: "white",
-    alignItems: "center",
-    justifyContent: "center",
     marginBottom: "1%",
     borderRadius: 15,
   },

@@ -7,11 +7,11 @@ import { NavigationContainer } from "@react-navigation/native";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../../firebaseConfig";
 
-import HomeScreen from "./HomeScreen";
+import HomeScreen from "./victim/HomeScreen";
 
 const { Navigator, Screen } = createNativeStackNavigator();
 
-export default function AuthStack({ uid }) {
+export default function UserStack({ uid }) {
   const setUser = useStoreActions((actions) => actions.setUser);
 
   useEffect(() => {
