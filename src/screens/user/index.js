@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useStoreActions } from "easy-peasy";
+import { useStoreActions, useStoreState } from "easy-peasy";
 
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { NavigationContainer } from "@react-navigation/native";
@@ -7,7 +7,8 @@ import { NavigationContainer } from "@react-navigation/native";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../../firebaseConfig";
 
-import HomeScreen from "./victim/HomeScreen";
+import { Panic, Calm } from "./victim/HomeScreen";
+import CustomNavigationBar from "./common/CustomNavigationBar";
 
 const { Navigator, Screen } = createNativeStackNavigator();
 
@@ -25,8 +26,18 @@ export default function UserStack({ uid }) {
 
   return (
     <NavigationContainer>
-      <Navigator>
-        <Screen name="Home" component={HomeScreen} />
+      <Navigator
+        initialRouteName="Calm"
+        screenOptions={{
+          header: CustomNavigationBar,
+        }}
+      >
+        <Screen name="Calm" component={Calm} />
+        <Screen
+          name="Panic"
+          component={Panic}
+          options={{ headerShown: false }}
+        />
       </Navigator>
     </NavigationContainer>
   );

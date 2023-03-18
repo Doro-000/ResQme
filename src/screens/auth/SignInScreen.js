@@ -51,7 +51,7 @@ export default function SignInScreen() {
             width: 300,
             height: 300,
           }}
-          source={require("../../assets/login.json")}
+          source={require("@assets/login.json")}
         />
       </View>
       <View style={style.formCard}>

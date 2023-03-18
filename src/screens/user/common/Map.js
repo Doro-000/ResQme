@@ -7,11 +7,16 @@ import { StyleSheet, View, Text } from "react-native";
 import { useStoreState, useStoreActions } from "easy-peasy";
 
 // LOCATION
+import * as TaskManager from "expo-task-manager";
 import * as Location from "expo-location";
+
+const LOCATION_TASK_NAME = "background-location-task";
 
 export default function Map() {
   const setLocation = useStoreActions((actions) => actions.setLocation);
   const location = useStoreState((state) => state.location);
+
+  const setPermissions = useStoreActions((actions) => actions.setPermissions);
 
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
@@ -20,16 +25,37 @@ export default function Map() {
   const getLocation = async () => {
     setLoading(true);
 
-    let { granted } = await Location.requestForegroundPermissionsAsync();
-    if (!granted) {
+    const { granted: foregroundStatus } =
+      await Location.requestForegroundPermissionsAsync();
+    if (foregroundStatus) {
+      const { granted: backgroundStatus } =
+        await Location.requestBackgroundPermissionsAsync();
+      if (backgroundStatus) {
+        await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
+          accuracy: Location.Accuracy.High,
+          deferredUpdatesInterval: 5000,
+        });
+      }
+      setPermissions({ foregroundStatus, backgroundStatus });
+    }
+
+    if (!foregroundStatus) {
       setLoading(false);
       setErrorMsg("Permission to access location was denied");
       return;
     }
 
     try {
-      let location = await Location.getCurrentPositionAsync();
-      setLocation(location.coords);
+      await Location.watchPositionAsync(
+        {
+          accuracy: Location.Accuracy.Lowest,
+          timeInterval: 10000,
+          distanceInterval: 0,
+        },
+        (location) => {
+          setLocation(location.coords);
+        }
+      );
     } catch (error) {
       setErrorMsg("Couldn't fetch Location, try again !");
     } finally {
@@ -58,7 +84,7 @@ export default function Map() {
               },
               pitch: 0,
               heading: 0,
-              zoom: 14,
+              zoom: 17,
             });
           }}
         />
@@ -69,10 +95,13 @@ export default function Map() {
   );
 }
 
+TaskManager.defineTask(LOCATION_TASK_NAME, ({ data: { locations }, error }) => {
+  if (error) {
+    console.log(error.message);
+  }
+});
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   map: {
     width: "100%",
     height: "100%",
