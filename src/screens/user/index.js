@@ -9,6 +9,7 @@ import { db } from "../../../firebaseConfig";
 
 import { Panic, Calm } from "./victim/HomeScreen";
 import CustomNavigationBar from "./common/CustomNavigationBar";
+import Profile from "./common/Profile";
 
 const { Navigator, Screen } = createNativeStackNavigator();
 
@@ -29,7 +30,7 @@ export default function UserStack({ uid }) {
       <Navigator
         initialRouteName="Calm"
         screenOptions={{
-          header: CustomNavigationBar,
+          header: (props) => <CustomNavigationBar {...props} />,
         }}
       >
         <Screen name="Calm" component={Calm} />
@@ -38,6 +39,7 @@ export default function UserStack({ uid }) {
           component={Panic}
           options={{ headerShown: false }}
         />
+        <Screen name="Profile" component={Profile} />
       </Navigator>
     </NavigationContainer>
   );

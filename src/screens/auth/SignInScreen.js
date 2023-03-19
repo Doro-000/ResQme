@@ -59,7 +59,6 @@ export default function SignInScreen() {
           style={style.formInput}
           mode={"outlined"}
           label={"Email"}
-          placeholder={"Email"}
           onChangeText={(input) => setEmail(input)}
           value={email}
         ></TextInput>
@@ -75,7 +74,6 @@ export default function SignInScreen() {
           style={style.formInput}
           mode={"outlined"}
           label={"Name"}
-          placeholder={"Your name"}
           onChangeText={(input) => setName(input)}
           value={name}
         ></TextInput>
