@@ -7,7 +7,7 @@ import { StyleSheet, View, Text } from "react-native";
 import { useStoreState, useStoreActions } from "easy-peasy";
 
 // LOCATION
-import * as TaskManager from "expo-task-manager";
+// import * as TaskManager from "expo-task-manager";
 import * as Location from "expo-location";
 
 const LOCATION_TASK_NAME = "background-location-task";
@@ -27,17 +27,17 @@ export default function Map() {
 
     const { granted: foregroundStatus } =
       await Location.requestForegroundPermissionsAsync();
-    if (foregroundStatus) {
-      const { granted: backgroundStatus } =
-        await Location.requestBackgroundPermissionsAsync();
-      if (backgroundStatus) {
-        await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
-          accuracy: Location.Accuracy.High,
-          deferredUpdatesInterval: 5000,
-        });
-      }
-      setPermissions({ foregroundStatus, backgroundStatus });
-    }
+    // if (foregroundStatus) {
+    //   const { granted: backgroundStatus } =
+    //     await Location.requestBackgroundPermissionsAsync();
+    //   if (backgroundStatus) {
+    //     await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
+    //       accuracy: Location.Accuracy.Lowest, // Background location update
+    //       deferredUpdatesInterval: 20000, // 2 minutes
+    //     });
+    //   }
+    // }
+    setPermissions(foregroundStatus);
 
     if (!foregroundStatus) {
       setLoading(false);
@@ -46,16 +46,10 @@ export default function Map() {
     }
 
     try {
-      await Location.watchPositionAsync(
-        {
-          accuracy: Location.Accuracy.Lowest,
-          timeInterval: 10000,
-          distanceInterval: 0,
-        },
-        (location) => {
-          setLocation(location.coords);
-        }
-      );
+      const location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High, // for inital location
+      });
+      setLocation(location.coords);
     } catch (error) {
       setErrorMsg("Couldn't fetch Location, try again !");
     } finally {
@@ -95,11 +89,11 @@ export default function Map() {
   );
 }
 
-TaskManager.defineTask(LOCATION_TASK_NAME, ({ data: { locations }, error }) => {
-  if (error) {
-    console.log(error.message);
-  }
-});
+// TaskManager.defineTask(LOCATION_TASK_NAME, ({ data: { locations }, error }) => {
+//   if (error) {
+//     console.log(error.message);
+//   }
+// });
 
 const styles = StyleSheet.create({
   map: {

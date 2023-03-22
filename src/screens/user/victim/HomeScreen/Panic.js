@@ -6,9 +6,19 @@ import { FAB, Text, Banner } from "react-native-paper";
 import { StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import * as Location from "expo-location";
+import { useStoreActions, useStoreState } from "easy-peasy";
+
+import { geoFire } from "../../../../../firebaseConfig";
+
 export default function Panic({ navigation }) {
   const [sound, setSound] = useState(null);
   const [_, setErrorMsg] = useState(null);
+
+  const setLocation = useStoreActions((actions) => actions.setLocation);
+  const location = useStoreState((state) => state.location);
+
+  const user = useStoreState((state) => state.user);
 
   async function playSound() {
     const { granted } = await Audio.requestPermissionsAsync();
@@ -29,7 +39,35 @@ export default function Panic({ navigation }) {
     }
   }
 
+  async function sendLocation() {
+    // set initial location
+    await geoFire.set(user.id, [location.latitude, location.longitude]);
+
+    await Location.watchPositionAsync(
+      {
+        accuracy: Location.Accuracy.Balanced, // foreground location update
+        timeInterval: 30000, // every 3 minutes
+      },
+      async (location) => {
+        setLocation(location.coords);
+
+        // update every 3 minutes
+        await geoFire.set(user.id, [
+          location.coords.latitude,
+          location.coords.longitude,
+        ]);
+      }
+    );
+  }
+
+  async function exitPanic() {
+    await geoFire.remove(user.id); // stop tracking on panic exit
+
+    navigation.navigate("Calm");
+  }
+
   useEffect(() => {
+    sendLocation();
     return sound
       ? () => {
           sound.unloadAsync();
@@ -65,7 +103,7 @@ export default function Panic({ navigation }) {
         />
         <FAB
           icon={"location-exit"}
-          onPress={() => navigation.navigate("Calm")}
+          onPress={exitPanic}
           variant="tertiary"
           customSize={80}
           style={[style.fabStyle, style.exitStyle]}
