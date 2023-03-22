@@ -3,6 +3,9 @@ import { isEmpty } from "lodash";
 
 export default locationStore = {
   location: {},
+  foreGroundPermission: false,
+  // backGroundPermission: false,
+
   setLocation: action((state, payload) => {
     state.location = payload;
   }),
@@ -10,6 +13,11 @@ export default locationStore = {
     if (isEmpty(state.location)) {
       return "";
     }
-    return `Longitude: ${state.location?.coords.longitude} \nLatitude: ${state.location?.coords.latitude} `;
+    return `Longitude: ${state.location?.longitude} \nLatitude: ${state.location?.latitude} `;
+  }),
+
+  setPermissions: action((state, foreGroundStatus) => {
+    state.foreGroundPermission = foreGroundStatus;
+    // state.backGroundPermission = backGroundStatus;
   }),
 };

@@ -1,17 +1,16 @@
 import AuthStack from "./auth";
 import UserStack from "./user";
 
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../../firebaseConfig";
+import { onAuthStateChanged, getAuth } from "firebase/auth";
 
 import { useEffect, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Text } from "react-native-paper";
+import { View, Text } from "react-native";
 
 export default function RootNavigator() {
   const [uid, setUid] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const auth = getAuth();
   useEffect(() => {
     onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
@@ -26,9 +25,15 @@ export default function RootNavigator() {
 
   if (loading) {
     return (
-      <SafeAreaView>
-        <Text>loading...</Text>
-      </SafeAreaView>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Text>Loading...</Text>
+      </View>
     );
   }
 
