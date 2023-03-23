@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
+// UI
 import MapView, { Marker } from "react-native-maps";
 import { StyleSheet, View, Text } from "react-native";
 
@@ -12,25 +13,20 @@ import * as Location from "expo-location";
 
 // const LOCATION_TASK_NAME = "background-location-task";
 
-import VictimDetail from "./VictimDetail";
-
 export default function Map() {
-  // location
-  const setLocation = useStoreActions((actions) => actions.setLocation);
-  const location = useStoreState((state) => state.location);
+  const {
+    setLocation,
+    location,
+    setPermissions,
+    toggleBottomSheet,
+    setSelectedVictim,
+  } = useStoreActions((actions) => actions);
 
-  // permissions
-  const setPermissions = useStoreActions((actions) => actions.setPermissions);
-
-  // ui
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
   const mapRef = useRef(null);
 
-  // victims
   const [victims, setVictims] = useState([]);
-  const [selectedVictim, setSelectedVictim] = useState(null);
-  const [bottomSheetActive, setBottomSheetActive] = useState(false);
 
   const getLocation = async () => {
     setLoading(true);
@@ -108,10 +104,6 @@ export default function Map() {
     }, 200);
   };
 
-  const toggleBottomSheet = () => {
-    setBottomSheetActive(!bottomSheetActive);
-  };
-
   useEffect(() => {
     getLocation();
     getVictims();
@@ -149,7 +141,6 @@ export default function Map() {
                   identifier={marker.id}
                   onPress={(e) => {
                     setSelectedVictim(e.nativeEvent.id);
-                    console.log(selectedVictim);
                   }}
                   onCalloutPress={(_) => {
                     toggleBottomSheet();
@@ -161,7 +152,6 @@ export default function Map() {
         ) : (
           <Text> {errorMsg}</Text>
         )}
-        <VictimDetail active={bottomSheetActive} />
       </View>
     </>
   );

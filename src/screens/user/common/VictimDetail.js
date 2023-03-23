@@ -2,7 +2,11 @@ import React, { useCallback, useMemo, useRef } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import BottomSheet from "@gorhom/bottom-sheet";
 
-const VictimDetail = ({ active }) => {
+import { useStoreState } from "easy-peasy";
+
+const VictimDetail = () => {
+  const { bottomSheetActive } = useStoreState((state) => state);
+
   // ref
   const bottomSheetRef = useRef(null);
 
@@ -18,7 +22,7 @@ const VictimDetail = ({ active }) => {
   return (
     <BottomSheet
       ref={bottomSheetRef}
-      index={active ? 1 : -1}
+      index={bottomSheetActive ? 1 : -1}
       snapPoints={snapPoints}
       onChange={handleSheetChanges}
       enablePanDownToClose
