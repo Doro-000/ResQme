@@ -17,7 +17,7 @@ import {
   FIREBASE_messagingSenderId,
   FIREBASE_appId,
   FIREBASE_measurementId,
-  FIREBASE_rdb_url,
+  FIREBASE_databaseURL,
 } from "@env";
 
 const firebaseConfig = {
@@ -28,18 +28,19 @@ const firebaseConfig = {
   messagingSenderId: FIREBASE_messagingSenderId,
   appId: FIREBASE_appId,
   measurementId: FIREBASE_measurementId,
+  databaseURL: FIREBASE_databaseURL,
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-initializeAuth(app, {
+const auth = initializeAuth(app, {
   persistence: getReactNativePersistence(AsyncStorage),
 });
 
 const db = getFirestore(app);
 
 const geoFire = new GeoFire(
-  ref(getDatabase(app, FIREBASE_rdb_url), "locations")
+  ref(getDatabase(app, FIREBASE_databaseURL), "locations")
 );
 
-export { app, db, geoFire };
+export { app, db, auth, geoFire };
