@@ -1,35 +1,128 @@
-import React, { useCallback, useMemo, useRef } from "react";
-import { View, Text, StyleSheet } from "react-native";
-import BottomSheet from "@gorhom/bottom-sheet";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { View, StyleSheet, Linking } from "react-native";
+import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import { Text, Avatar, Button } from "react-native-paper";
+import { AntDesign } from "@expo/vector-icons";
 
-import { useStoreState } from "easy-peasy";
+const VictimDetail = ({
+  bottomSheetRef,
+  currentVictim,
+  changeBottomSheetActive,
+  backDrop,
+}) => {
+  const [victim, setVictim] = useState(null);
 
-const VictimDetail = () => {
-  const { bottomSheetActive } = useStoreState((state) => state);
+  const getVictimData = async () => {
+    const data = new Promise((resolve) => {
+      if (currentVictim === 1) {
+        return resolve({
+          profilePicture: require("@assets/lego.png"),
+          name: "abebe",
+          phone: "+491744818011",
+          lastSeen: "10 seconds ago",
+          location: {
+            latitude: 53.17167033346971,
+            longitude: 8.656929163755606,
+          },
+        });
+      } else {
+        return resolve({
+          profilePicture: require("@assets/lego.png"),
+          name: "abebech",
+          phone: "+491744818012",
+          lastSeen: "10 seconds ago",
+          location: {
+            latitude: 53.161143478761694,
+            longitude: 8.646358017780486,
+          },
+        });
+      }
+    });
 
-  // ref
-  const bottomSheetRef = useRef(null);
+    setTimeout(async () => {
+      setVictim(await data);
+    }, 200);
+  };
 
-  // variables
-  const snapPoints = useMemo(() => ["25%", "50%"], []);
+  const snapPoints = useMemo(() => ["50%", "75%"], []);
 
   // callbacks
   const handleSheetChanges = useCallback((index) => {
-    console.log("handleSheetChanges", index);
+    if (index === -1) {
+      changeBottomSheetActive(false);
+    }
   }, []);
+
+  useEffect(() => {
+    getVictimData();
+  }, [currentVictim]);
 
   // renders
   return (
     <BottomSheet
       ref={bottomSheetRef}
-      index={bottomSheetActive ? 1 : -1}
+      index={-1}
       snapPoints={snapPoints}
       onChange={handleSheetChanges}
       enablePanDownToClose
+      backdropComponent={backDrop}
     >
-      <View style={styles.contentContainer}>
-        <Text>Awesome 🎉</Text>
-      </View>
+      <BottomSheetView style={styles.contentContainer}>
+        <View style={styles.sectionCard}>
+          <View style={styles.victimPic}>
+            <Avatar.Image size={75} source={victim.profilePicture} />
+          </View>
+          <View style={styles.victimInfo}>
+            <View style={styles.victimInfoItem}>
+              <AntDesign name="user" size={20} />
+              <Text>{victim.name}</Text>
+            </View>
+            <View style={styles.victimInfoItem}>
+              <AntDesign name="clockcircleo" size={24} color="black" />
+              <Text>{victim.lastSeen}</Text>
+            </View>
+          </View>
+          <Button
+            icon={"phone"}
+            mode="contained"
+            style={{
+              alignSelf: "center",
+            }}
+            onPress={() => {
+              Linking.openURL(`tel:${victim.phone}`);
+            }}
+          >
+            Call
+          </Button>
+        </View>
+        <View style={styles.sectionCard}>
+          <View style={styles.victimPic}>
+            <Avatar.Image size={75} source={victim.profilePicture} />
+          </View>
+          <View style={styles.victimInfo}>
+            <View style={styles.victimInfoItem}>
+              <AntDesign name="user" size={20} />
+              <Text>{victim.name}</Text>
+            </View>
+            <View style={styles.victimInfoItem}>
+              <AntDesign name="clockcircleo" size={24} color="black" />
+              <Text>{victim.lastSeen}</Text>
+            </View>
+          </View>
+          <Button
+            icon={"phone"}
+            mode="contained"
+            style={{
+              alignSelf: "center",
+            }}
+            onPress={() => {
+              Linking.openURL(`tel:${victim.phone}`);
+            }}
+          >
+            Call
+          </Button>
+        </View>
+      </BottomSheetView>
     </BottomSheet>
   );
 };
@@ -37,7 +130,36 @@ const VictimDetail = () => {
 const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
-    alignItems: "center",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+  sectionCard: {
+    margin: 5,
+    justifyContent: "space-between",
+    flexDirection: "row",
+    padding: 7,
+    backgroundColor: "white",
+    shadowColor: "black",
+    shadowOffset: { width: -2, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 10,
+    borderRadius: 10,
+  },
+  victimPic: {
+    borderWidth: 2,
+    borderRadius: 100,
+    padding: 2,
+    borderColor: "#a81c06",
+    alignSelf: "flex-start",
+  },
+  victimInfo: {
+    gap: 10,
+    justifyContent: "center",
+  },
+  victimInfoItem: {
+    flexDirection: "row",
+    gap: 4,
   },
 });
 

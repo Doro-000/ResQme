@@ -1,3 +1,5 @@
+import React from "react";
+
 import { useState } from "react";
 import { useStoreActions } from "easy-peasy";
 
@@ -7,20 +9,19 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import LottieView from "lottie-react-native";
 
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { collection, doc, setDoc } from "firebase/firestore";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../../../firebaseConfig";
 
-export default function SignUpScreen({ navigation }) {
+export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
   const [pass, setPassword] = useState("");
 
-  const setUser = useStoreActions((actions) => actions.setUser);
+  const { setUser } = useStoreActions((a) => a);
 
-  const handleSignUp = async () => {
+  const handleLogin = async () => {
     try {
-      const userCredential = await createUserWithEmailAndPassword(
+      const userCredential = await signInWithEmailAndPassword(
         auth,
         email,
         pass
@@ -28,16 +29,9 @@ export default function SignUpScreen({ navigation }) {
 
       const id = userCredential.user.uid;
 
-      const user = {
-        name,
-        email,
-        id,
-      };
-
-      // Add to users collection
-      await setDoc(doc(collection(db, "users"), id), user);
-
-      setUser(user);
+      // get user from collection
+      const user = await getDoc(doc(db, "users", id));
+      setUser(user.data());
     } catch (error) {
       console.log(error);
     }
@@ -71,30 +65,23 @@ export default function SignUpScreen({ navigation }) {
           onChangeText={(input) => setPassword(input)}
           value={pass}
         ></TextInput>
-        <TextInput
-          style={style.formInput}
-          mode={"outlined"}
-          label={"Name"}
-          onChangeText={(input) => setName(input)}
-          value={name}
-        ></TextInput>
 
         <Button
           style={style.signInButton}
-          onPress={handleSignUp}
+          onPress={handleLogin}
           mode="contained"
           icon="login"
         >
-          Sign Up !
+          Login
         </Button>
       </View>
       <Button
-        onPress={() => navigation.navigate("login")}
+        onPress={() => navigation.navigate("signup")}
         style={{
           marginTop: 30,
         }}
       >
-        Already have an account? Login
+        New Here? Sign Up
       </Button>
     </SafeAreaView>
   );

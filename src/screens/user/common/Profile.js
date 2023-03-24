@@ -12,13 +12,13 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { useStoreState } from "easy-peasy";
 
 export default function Profile() {
-  const user = useStoreState((state) => state.user);
+  const { user } = useStoreState((s) => s);
 
   const [isEditing, setEditing] = useState(false);
   const height = useHeaderHeight();
 
-  const [email, setEmail] = useState(user.name);
-  const [name, setName] = useState(user.email);
+  const [email, setEmail] = useState(user.email);
+  const [name, setName] = useState(user.name);
 
   const toggleEdit = () => {
     setEditing(isEditing ^ true);
@@ -39,7 +39,7 @@ export default function Profile() {
           <Button
             icon="camera"
             mode="text"
-            onPress={() => toggleEdit()}
+            onPress={() => {}}
             style={style.profilePicButton}
           >
             Change Profile Picture

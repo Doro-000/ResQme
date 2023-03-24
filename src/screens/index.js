@@ -15,11 +15,10 @@ export default function RootNavigator() {
     onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
         setUid(firebaseUser.uid);
-        setLoading(false);
       } else {
         setUid(null);
-        setLoading(false);
       }
+      setLoading(false);
     });
   }, []);
 

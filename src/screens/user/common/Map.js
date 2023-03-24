@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 
 // UI
-import MapView, { Marker } from "react-native-maps";
+import MapView from "react-native-maps";
 import { StyleSheet, View, Text } from "react-native";
 
 // STORE
@@ -13,20 +13,14 @@ import * as Location from "expo-location";
 
 // const LOCATION_TASK_NAME = "background-location-task";
 
-export default function Map() {
-  const {
-    setLocation,
-    location,
-    setPermissions,
-    toggleBottomSheet,
-    setSelectedVictim,
-  } = useStoreActions((actions) => actions);
+export default function Map({ children }) {
+  const { setPermissions, setLocation } = useStoreActions((a) => a);
+
+  const { location } = useStoreState((s) => s);
 
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
   const mapRef = useRef(null);
-
-  const [victims, setVictims] = useState([]);
 
   const getLocation = async () => {
     setLoading(true);
@@ -63,97 +57,37 @@ export default function Map() {
     }
   };
 
-  const getVictims = async () => {
-    const points = new Promise((resolve) => {
-      return resolve([
-        {
-          latlng: { latitude: 53.17167033346971, longitude: 8.656929163755606 },
-          title: "Abebe",
-          description: "Click to see more details !",
-          id: "1",
-        },
-        {
-          latlng: {
-            latitude: 53.161143478761694,
-            longitude: 8.646358017780486,
-          },
-          title: "Abebe",
-          description: "Click to see more details !",
-          id: "2",
-        },
-        {
-          latlng: {
-            latitude: 53.169008220980636,
-            longitude: 8.652513014217224,
-          },
-          title: "Abebe",
-          description: "Click to see more details !",
-          id: "3",
-        },
-        {
-          latlng: { latitude: 53.16956101637453, longitude: 8.656865927034149 },
-          title: "Abebe",
-          description: "Click to see more details !",
-          id: "4",
-        },
-      ]);
-    });
-
-    setTimeout(async () => {
-      setVictims(await points);
-    }, 200);
-  };
-
   useEffect(() => {
     getLocation();
-    getVictims();
   }, []);
 
   return (
-    <>
-      <View style={styles.container}>
-        {loading ? (
-          <Text>Loading Map...</Text>
-        ) : location ? (
-          <MapView
-            style={styles.map}
-            showsUserLocation={true}
-            ref={mapRef}
-            onLayout={() => {
-              mapRef.current.animateCamera({
-                center: {
-                  latitude: location.latitude,
-                  longitude: location.longitude,
-                },
-                pitch: 0,
-                heading: 0,
-                zoom: 15,
-              });
-            }}
-          >
-            {victims.map((marker, index) => {
-              return (
-                <Marker
-                  key={index}
-                  coordinate={marker.latlng}
-                  title={marker.title}
-                  description={marker.description}
-                  identifier={marker.id}
-                  onPress={(e) => {
-                    setSelectedVictim(e.nativeEvent.id);
-                  }}
-                  onCalloutPress={(_) => {
-                    toggleBottomSheet();
-                  }}
-                />
-              );
-            })}
-          </MapView>
-        ) : (
-          <Text> {errorMsg}</Text>
-        )}
-      </View>
-    </>
+    <View>
+      {loading ? (
+        <Text>Loading Map...</Text>
+      ) : location ? (
+        <MapView
+          style={styles.map}
+          showsUserLocation={true}
+          ref={mapRef}
+          onLayout={() => {
+            mapRef.current.animateCamera({
+              center: {
+                latitude: location.latitude,
+                longitude: location.longitude,
+              },
+              pitch: 0,
+              heading: 0,
+              zoom: 15,
+            });
+          }}
+        >
+          {children}
+        </MapView>
+      ) : (
+        <Text> {errorMsg}</Text>
+      )}
+    </View>
   );
 }
 
@@ -167,10 +101,5 @@ const styles = StyleSheet.create({
   map: {
     width: "100%",
     height: "100%",
-  },
-  bottomSheetContainer: {
-    flex: 1,
-    padding: 24,
-    backgroundColor: "grey",
   },
 });

@@ -11,12 +11,16 @@ import store from "./state";
 // ROOT NAVIGATION
 import RootNavigator from "./screens";
 
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+
 function App() {
   return (
     <StoreProvider store={store}>
-      <PaperProvider>
-        <RootNavigator />
-      </PaperProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <PaperProvider>
+          <RootNavigator />
+        </PaperProvider>
+      </GestureHandlerRootView>
     </StoreProvider>
   );
 }
