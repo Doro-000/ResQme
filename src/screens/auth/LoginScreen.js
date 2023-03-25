@@ -4,7 +4,13 @@ import { useState } from "react";
 import { useStoreActions } from "easy-peasy";
 
 import { View, StyleSheet } from "react-native";
-import { Button, TextInput, Text } from "react-native-paper";
+import {
+  Button,
+  TextInput,
+  Text,
+  Checkbox,
+  IconButton,
+} from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import LottieView from "lottie-react-native";
@@ -16,6 +22,7 @@ import { auth, db } from "../../../firebaseConfig";
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [pass, setPassword] = useState("");
+  const [isNgo, setNgo] = useState(false);
 
   const { setUser } = useStoreActions((a) => a);
 
@@ -31,7 +38,8 @@ export default function LoginScreen({ navigation }) {
 
       // get user from collection
       const user = await getDoc(doc(db, "users", id));
-      setUser(user.data());
+
+      setUser({ ...user.data(), isNgo });
     } catch (error) {
       console.log(error);
     }
@@ -56,7 +64,8 @@ export default function LoginScreen({ navigation }) {
           label={"Email"}
           onChangeText={(input) => setEmail(input)}
           value={email}
-        ></TextInput>
+        />
+
         <TextInput
           style={style.formInput}
           mode={"outlined"}
@@ -64,8 +73,26 @@ export default function LoginScreen({ navigation }) {
           secureTextEntry={true}
           onChangeText={(input) => setPassword(input)}
           value={pass}
-        ></TextInput>
+        />
 
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
+          <Checkbox.Item
+            status={isNgo ? "checked" : "unchecked"}
+            onPress={() => {
+              setNgo(!isNgo);
+            }}
+            style={{
+              paddingHorizontal: 0,
+              paddingVertical: 0,
+            }}
+          />
+          <Text>SAR team login</Text>
+        </View>
         <Button
           style={style.signInButton}
           onPress={handleLogin}
@@ -83,6 +110,28 @@ export default function LoginScreen({ navigation }) {
       >
         New Here? Sign Up
       </Button>
+      <View
+        style={{
+          alignSelf: "flex-end",
+          flexDirection: "row",
+          alignItems: "center",
+          backgroundColor: "#E8DEF8",
+          paddingHorizontal: 5,
+          paddingVertical: 10,
+          borderRadius: 10,
+        }}
+      >
+        <IconButton icon="information" size={15} mode="outlined" />
+        <Text
+          variant="bodySmall"
+          style={{
+            flexShrink: 1,
+          }}
+        >
+          Use the information button to learn how to assist the victim & wait
+          for the authorites arrive!
+        </Text>
+      </View>
     </SafeAreaView>
   );
 }
@@ -99,7 +148,6 @@ const style = StyleSheet.create({
     rowGap: 3,
   },
   signInButton: {
-    backgroundColor: "#05668D",
     marginTop: 20,
     alignSelf: "flex-end",
   },

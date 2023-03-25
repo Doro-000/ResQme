@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useStoreActions } from "easy-peasy";
 
 import { View, StyleSheet } from "react-native";
-import { Button, TextInput, Text } from "react-native-paper";
+import { Button, TextInput, Text, Checkbox } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import LottieView from "lottie-react-native";
@@ -15,6 +15,8 @@ export default function SignUpScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [pass, setPassword] = useState("");
+
+  const [isNgo, setNgo] = useState(false);
 
   const setUser = useStoreActions((actions) => actions.setUser);
 
@@ -37,7 +39,7 @@ export default function SignUpScreen({ navigation }) {
       // Add to users collection
       await setDoc(doc(collection(db, "users"), id), user);
 
-      setUser(user);
+      setUser({ ...user, isNgo });
     } catch (error) {
       console.log(error);
     }
@@ -78,6 +80,24 @@ export default function SignUpScreen({ navigation }) {
           onChangeText={(input) => setName(input)}
           value={name}
         ></TextInput>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
+          <Checkbox.Item
+            status={isNgo ? "checked" : "unchecked"}
+            onPress={() => {
+              setNgo(!isNgo);
+            }}
+            style={{
+              paddingHorizontal: 0,
+              paddingVertical: 0,
+            }}
+          />
+          <Text>SAR team login</Text>
+        </View>
 
         <Button
           style={style.signInButton}
@@ -112,7 +132,6 @@ const style = StyleSheet.create({
     rowGap: 3,
   },
   signInButton: {
-    backgroundColor: "#05668D",
     marginTop: 20,
     alignSelf: "flex-end",
   },
