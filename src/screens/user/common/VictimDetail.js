@@ -68,60 +68,37 @@ const VictimDetail = ({
       backdropComponent={backDrop}
     >
       <BottomSheetView style={styles.contentContainer}>
-        <View style={styles.sectionCard}>
-          <View style={styles.victimPic}>
-            <Avatar.Image size={75} source={victim.profilePicture} />
-          </View>
-          <View style={styles.victimInfo}>
-            <View style={styles.victimInfoItem}>
-              <AntDesign name="user" size={20} />
-              <Text>{victim.name}</Text>
+        {victim ? (
+          <View style={styles.sectionCard}>
+            <View style={styles.victimPic}>
+              <Avatar.Image size={75} source={victim.profilePicture} />
             </View>
-            <View style={styles.victimInfoItem}>
-              <AntDesign name="clockcircleo" size={24} color="black" />
-              <Text>{victim.lastSeen}</Text>
+            <View style={styles.victimInfo}>
+              <View style={styles.victimInfoItem}>
+                <AntDesign name="user" size={20} />
+                <Text>{victim.name}</Text>
+              </View>
+              <View style={styles.victimInfoItem}>
+                <AntDesign name="clockcircleo" size={24} color="black" />
+                <Text>{victim.lastSeen}</Text>
+              </View>
             </View>
+            <Button
+              icon={"phone"}
+              mode="contained"
+              style={{
+                alignSelf: "center",
+              }}
+              onPress={() => {
+                Linking.openURL(`tel:${victim.phone}`);
+              }}
+            >
+              Call
+            </Button>
           </View>
-          <Button
-            icon={"phone"}
-            mode="contained"
-            style={{
-              alignSelf: "center",
-            }}
-            onPress={() => {
-              Linking.openURL(`tel:${victim.phone}`);
-            }}
-          >
-            Call
-          </Button>
-        </View>
-        <View style={styles.sectionCard}>
-          <View style={styles.victimPic}>
-            <Avatar.Image size={75} source={victim.profilePicture} />
-          </View>
-          <View style={styles.victimInfo}>
-            <View style={styles.victimInfoItem}>
-              <AntDesign name="user" size={20} />
-              <Text>{victim.name}</Text>
-            </View>
-            <View style={styles.victimInfoItem}>
-              <AntDesign name="clockcircleo" size={24} color="black" />
-              <Text>{victim.lastSeen}</Text>
-            </View>
-          </View>
-          <Button
-            icon={"phone"}
-            mode="contained"
-            style={{
-              alignSelf: "center",
-            }}
-            onPress={() => {
-              Linking.openURL(`tel:${victim.phone}`);
-            }}
-          >
-            Call
-          </Button>
-        </View>
+        ) : (
+          <Text>Please select a victim from the map !</Text>
+        )}
       </BottomSheetView>
     </BottomSheet>
   );
