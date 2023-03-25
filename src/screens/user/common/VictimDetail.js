@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { View, StyleSheet, Linking } from "react-native";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
-import { Text, Avatar, Button } from "react-native-paper";
+import { Text, Avatar, Button, IconButton } from "react-native-paper";
 import { AntDesign } from "@expo/vector-icons";
 
 const VictimDetail = ({
@@ -44,7 +44,7 @@ const VictimDetail = ({
     }, 200);
   };
 
-  const snapPoints = useMemo(() => ["50%", "75%"], []);
+  const snapPoints = useMemo(() => ["50%"], []);
 
   // callbacks
   const handleSheetChanges = useCallback((index) => {
@@ -68,60 +68,62 @@ const VictimDetail = ({
       backdropComponent={backDrop}
     >
       <BottomSheetView style={styles.contentContainer}>
-        <View style={styles.sectionCard}>
-          <View style={styles.victimPic}>
-            <Avatar.Image size={75} source={victim.profilePicture} />
-          </View>
-          <View style={styles.victimInfo}>
-            <View style={styles.victimInfoItem}>
-              <AntDesign name="user" size={20} />
-              <Text>{victim.name}</Text>
+        {victim ? (
+          <>
+            <View style={styles.sectionCard}>
+              <View style={styles.victimPic}>
+                <Avatar.Image size={75} source={victim.profilePicture} />
+              </View>
+              <View style={styles.victimInfo}>
+                <View style={styles.victimInfoItem}>
+                  <AntDesign name="user" size={20} />
+                  <Text>{victim.name}</Text>
+                </View>
+                <View style={styles.victimInfoItem}>
+                  <AntDesign name="clockcircleo" size={24} color="black" />
+                  <Text>{victim.lastSeen}</Text>
+                </View>
+              </View>
+              <Button
+                icon={"phone"}
+                mode="contained"
+                style={{
+                  alignSelf: "center",
+                }}
+                onPress={() => {
+                  Linking.openURL(`tel:${victim.phone}`);
+                }}
+              >
+                Call
+              </Button>
             </View>
-            <View style={styles.victimInfoItem}>
-              <AntDesign name="clockcircleo" size={24} color="black" />
-              <Text>{victim.lastSeen}</Text>
+            <View style={[styles.sectionCard, styles.actionButton]}>
+              <View>
+                <IconButton icon="information" mode="contained" size={50} />
+                <Text> How to help ?</Text>
+              </View>
+
+              <View>
+                <IconButton icon="directions" size={50} mode="contained" />
+                <Text> Directions</Text>
+              </View>
             </View>
-          </View>
-          <Button
-            icon={"phone"}
-            mode="contained"
-            style={{
-              alignSelf: "center",
-            }}
-            onPress={() => {
-              Linking.openURL(`tel:${victim.phone}`);
-            }}
-          >
-            Call
-          </Button>
-        </View>
-        <View style={styles.sectionCard}>
-          <View style={styles.victimPic}>
-            <Avatar.Image size={75} source={victim.profilePicture} />
-          </View>
-          <View style={styles.victimInfo}>
-            <View style={styles.victimInfoItem}>
-              <AntDesign name="user" size={20} />
-              <Text>{victim.name}</Text>
+            <View style={[styles.sectionCard, styles.infoCard]}>
+              <IconButton icon="information" size={15} mode="outlined" />
+              <Text
+                variant="bodySmall"
+                style={{
+                  flexShrink: 1,
+                }}
+              >
+                Use the information button to learn how to assist the victim &
+                wait for the authorites arrive!
+              </Text>
             </View>
-            <View style={styles.victimInfoItem}>
-              <AntDesign name="clockcircleo" size={24} color="black" />
-              <Text>{victim.lastSeen}</Text>
-            </View>
-          </View>
-          <Button
-            icon={"phone"}
-            mode="contained"
-            style={{
-              alignSelf: "center",
-            }}
-            onPress={() => {
-              Linking.openURL(`tel:${victim.phone}`);
-            }}
-          >
-            Call
-          </Button>
-        </View>
+          </>
+        ) : (
+          <Text>Please select a victim from the map !</Text>
+        )}
       </BottomSheetView>
     </BottomSheet>
   );
@@ -132,6 +134,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 10,
     paddingVertical: 5,
+    gap: 3,
   },
   sectionCard: {
     margin: 5,
@@ -160,6 +163,15 @@ const styles = StyleSheet.create({
   victimInfoItem: {
     flexDirection: "row",
     gap: 4,
+  },
+  actionButton: {
+    paddingBottom: 20,
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+  },
+  infoCard: {
+    alignItems: "center",
+    backgroundColor: "#E8DEF8",
   },
 });
 

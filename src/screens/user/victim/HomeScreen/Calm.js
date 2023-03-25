@@ -6,13 +6,19 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { Marker } from "react-native-maps";
 import { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 
+import { SegmentedButtons } from "react-native-paper";
+
 import Map from "../../common/Map";
 import VictimDetail from "../../common/VictimDetail";
+
+import { useStoreState } from "easy-peasy";
 
 export default function Calm({ navigation }) {
   const [victims, setVictims] = useState([]);
   const [selectedVictim, setSelectedVictim] = useState(null);
   const [bottomSheetActive, setBottomSheetActive] = useState(false);
+
+  const { user } = useStoreState((s) => s);
 
   // Bottom sheet
   const bottomSheetRef = useRef(null);
@@ -88,30 +94,49 @@ export default function Calm({ navigation }) {
         </Map>
       </View>
 
-      <SwipeButton
-        goBackToStart
-        Icon={
-          <MaterialIcons
-            name="keyboard-arrow-right"
-            size={50}
-            color="#DD404B"
-          />
-        }
-        iconContainerStyle={{
-          backgroundColor: "#152228",
-        }}
-        onComplete={() => navigation.navigate("Panic")}
-        title="RESCUE ME !"
-        borderRadius={180}
-        underlayTitle="Release to complete"
-        underlayTitleStyle={{ color: "white" }}
-        containerStyle={style.swipeButtonStyle}
-        completeThresholdPercentage={80}
-        titleStyle={{
-          color: "white",
-          fontWeight: "bold",
-        }}
-      />
+      {user.isNgo ? (
+        <SegmentedButtons
+          value={value}
+          onValueChange={setValue}
+          buttons={[
+            {
+              value: "walk",
+              label: "Walking",
+            },
+            {
+              value: "train",
+              label: "Transit",
+            },
+            { value: "drive", label: "Driving" },
+          ]}
+        />
+      ) : (
+        <SwipeButton
+          goBackToStart
+          Icon={
+            <MaterialIcons
+              name="keyboard-arrow-right"
+              size={50}
+              color="#DD404B"
+            />
+          }
+          iconContainerStyle={{
+            backgroundColor: "#152228",
+          }}
+          onComplete={() => navigation.navigate("Panic")}
+          title="RESCUE ME !"
+          borderRadius={180}
+          underlayTitle="Release to complete"
+          underlayTitleStyle={{ color: "white" }}
+          containerStyle={style.swipeButtonStyle}
+          completeThresholdPercentage={80}
+          titleStyle={{
+            color: "white",
+            fontWeight: "bold",
+          }}
+        />
+      )}
+
       <VictimDetail
         changeBottomSheetActive={setBottomSheetActive}
         bottomSheetRef={bottomSheetRef}
