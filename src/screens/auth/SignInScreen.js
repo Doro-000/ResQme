@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useStoreActions } from "easy-peasy";
 
 import { View, StyleSheet } from "react-native";
 import { Button, TextInput, Text, Checkbox } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
+import PhoneInput from "react-native-phone-number-input";
 
 import LottieView from "lottie-react-native";
 
@@ -13,9 +14,12 @@ import { auth, db } from "../../../firebaseConfig";
 
 export default function SignUpScreen({ navigation }) {
   const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
+  const [phoneNum, setPhoneNumber] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [pass, setPassword] = useState("");
 
+  // const phoneInput = useRef<PhoneInput>(null);
   const [isNgo, setNgo] = useState(false);
 
   const setUser = useStoreActions((actions) => actions.setUser);
@@ -31,8 +35,10 @@ export default function SignUpScreen({ navigation }) {
       const id = userCredential.user.uid;
 
       const user = {
-        name,
+        firstName,
+        lastName,
         email,
+        phoneNum,
         id,
       };
 
@@ -61,6 +67,20 @@ export default function SignUpScreen({ navigation }) {
         <TextInput
           style={style.formInput}
           mode={"outlined"}
+          label={"First Name"}
+          onChangeText={(input) => setFirstName(input)}
+          value={firstName}
+        ></TextInput>
+        <TextInput
+          style={style.formInput}
+          mode={"outlined"}
+          label={"Last Name"}
+          onChangeText={(input) => setLastName(input)}
+          value={lastName}
+        ></TextInput>
+        <TextInput
+          style={style.formInput}
+          mode={"outlined"}
           label={"Email"}
           onChangeText={(input) => setEmail(input)}
           value={email}
@@ -73,13 +93,16 @@ export default function SignUpScreen({ navigation }) {
           onChangeText={(input) => setPassword(input)}
           value={pass}
         ></TextInput>
-        <TextInput
-          style={style.formInput}
+
+        <PhoneInput
           mode={"outlined"}
-          label={"Name"}
-          onChangeText={(input) => setName(input)}
-          value={name}
-        ></TextInput>
+          label={"Phone Number"}
+          defaultCode='DE'
+          secureTextEntry={true}
+          onChangeText={(text) => setPhoneNumber(text)}
+          value={phoneNum}
+        ></PhoneInput>
+        
         <View
           style={{
             flexDirection: "row",
@@ -136,3 +159,6 @@ const style = StyleSheet.create({
     alignSelf: "flex-end",
   },
 });
+
+
+
