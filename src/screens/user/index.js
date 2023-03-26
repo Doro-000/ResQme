@@ -16,12 +16,13 @@ const { Navigator, Screen } = createNativeStackNavigator();
 export default function UserStack({ uid }) {
   const setUser = useStoreActions((actions) => actions.setUser);
 
+  const getUserInfo = async (uid) => {
+    const userDoc = doc(db, "users", uid);
+    const userInfo = await getDoc(userDoc);
+    setUser(userInfo.data());
+  };
+
   useEffect(() => {
-    const getUserInfo = async (uid) => {
-      const userDoc = doc(db, "users", uid);
-      const userInfo = await getDoc(userDoc);
-      setUser(userInfo.data());
-    };
     getUserInfo(uid);
   }, [uid]);
 

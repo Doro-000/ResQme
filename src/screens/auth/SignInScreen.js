@@ -2,7 +2,13 @@ import { useState } from "react";
 import { useStoreActions } from "easy-peasy";
 
 import { View, StyleSheet } from "react-native";
-import { Button, TextInput, Text, Checkbox } from "react-native-paper";
+import {
+  Button,
+  TextInput,
+  Text,
+  Checkbox,
+  IconButton,
+} from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import LottieView from "lottie-react-native";
@@ -34,12 +40,13 @@ export default function SignUpScreen({ navigation }) {
         name,
         email,
         id,
+        isNgo,
       };
 
       // Add to users collection
       await setDoc(doc(collection(db, "users"), id), user);
 
-      setUser({ ...user, isNgo });
+      setUser(user);
     } catch (error) {
       console.log(error);
     }
@@ -99,6 +106,33 @@ export default function SignUpScreen({ navigation }) {
           <Text>SAR team login</Text>
         </View>
 
+        {isNgo && (
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              backgroundColor: "#e6b800",
+              paddingHorizontal: 5,
+              paddingVertical: 10,
+              borderRadius: 10,
+            }}
+          >
+            <IconButton
+              icon="information"
+              size={15}
+              mode="outlined"
+              iconColor="black"
+            />
+            <Text
+              variant="bodySmall"
+              style={{
+                flexShrink: 1,
+              }}
+            >
+              This option presents the App from a SAR team member's perspective.
+            </Text>
+          </View>
+        )}
         <Button
           style={style.signInButton}
           onPress={handleSignUp}

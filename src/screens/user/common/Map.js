@@ -2,7 +2,15 @@ import { useState, useEffect, useRef } from "react";
 
 // UI
 import MapView from "react-native-maps";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View } from "react-native";
+import {
+  IconButton,
+  Modal,
+  Divider,
+  RadioButton,
+  Button,
+  Text,
+} from "react-native-paper";
 
 // STORE
 import { useStoreState, useStoreActions } from "easy-peasy";
@@ -13,14 +21,20 @@ import * as Location from "expo-location";
 
 // const LOCATION_TASK_NAME = "background-location-task";
 
-export default function Map({ children }) {
+export default function Map({ children, mapRef, layoutAnimation }) {
   const { setPermissions, setLocation } = useStoreActions((a) => a);
 
   const { location } = useStoreState((s) => s);
 
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
-  const mapRef = useRef(null);
+
+  const [visible, setVisible] = useState(false);
+
+  const [mapType, setMapType] = useState("standard");
+
+  const showModal = () => setVisible(true);
+  const hideModal = () => setVisible(false);
 
   const getLocation = async () => {
     setLoading(true);
@@ -66,24 +80,78 @@ export default function Map({ children }) {
       {loading ? (
         <Text>Loading Map...</Text>
       ) : location ? (
-        <MapView
-          style={styles.map}
-          showsUserLocation={true}
-          ref={mapRef}
-          onLayout={() => {
-            mapRef.current.animateCamera({
-              center: {
-                latitude: location.latitude,
-                longitude: location.longitude,
-              },
-              pitch: 0,
-              heading: 0,
-              zoom: 15,
-            });
-          }}
-        >
-          {children}
-        </MapView>
+        <View>
+          <MapView
+            style={styles.map}
+            showsUserLocation={true}
+            ref={mapRef}
+            onLayout={layoutAnimation}
+            toolbarEnabled={false}
+            mapType={mapType}
+          >
+            {children}
+          </MapView>
+          <IconButton
+            icon="layers"
+            style={styles.layerButton}
+            mode={"contained"}
+            iconColor="#646464"
+            containerColor="white"
+            onPress={showModal}
+          />
+          <Modal
+            visible={visible}
+            onDismiss={hideModal}
+            contentContainerStyle={styles.modal}
+          >
+            <Text variant="headlineSmall">Change Map Type</Text>
+            <Divider />
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-evenly",
+              }}
+            >
+              <View>
+                <RadioButton.Item
+                  value="standard"
+                  label="Standard"
+                  status={mapType === "standard" ? "checked" : "unchecked"}
+                  onPress={() => setMapType("standard")}
+                />
+                <RadioButton.Item
+                  value="satellite"
+                  label="Satellite"
+                  status={mapType === "satellite" ? "checked" : "unchecked"}
+                  onPress={() => setMapType("satellite")}
+                />
+              </View>
+              <View>
+                <RadioButton.Item
+                  value="hybrid"
+                  label="Hybrid"
+                  status={mapType === "hybrid" ? "checked" : "unchecked"}
+                  onPress={() => setMapType("hybrid")}
+                />
+                <RadioButton.Item
+                  value="terrain"
+                  label="Terrain"
+                  status={mapType === "terrain" ? "checked" : "unchecked"}
+                  onPress={() => setMapType("terrain")}
+                />
+              </View>
+            </View>
+            <Button
+              icon="check"
+              style={{
+                alignSelf: "flex-end",
+              }}
+              onPress={hideModal}
+            >
+              Save
+            </Button>
+          </Modal>
+        </View>
       ) : (
         <Text> {errorMsg}</Text>
       )}
@@ -101,5 +169,20 @@ const styles = StyleSheet.create({
   map: {
     width: "100%",
     height: "100%",
+  },
+  layerButton: {
+    position: "absolute",
+    top: 50,
+    right: 4,
+    opacity: 0.7,
+    borderRadius: 3.5,
+  },
+  modal: {
+    backgroundColor: "white",
+    padding: 20,
+    margin: 20,
+    flexBasis: "auto",
+    flexShrink: 1,
+    gap: 10,
   },
 });

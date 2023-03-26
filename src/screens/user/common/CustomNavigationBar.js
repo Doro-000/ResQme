@@ -58,7 +58,7 @@ export default function CustomNavigationBar({ navigation }) {
           onDismiss={hideModal}
           contentContainerStyle={styles.modal}
         >
-          <Text variant="headlineLarge">Log out?</Text>
+          <Text variant="headlineSmall">Log out</Text>
           <Divider />
           <Text>Are you sure you want to log out ?</Text>
           <View style={styles.buttonContainer}>
@@ -83,7 +83,7 @@ styles = StyleSheet.create({
     gap: 10,
   },
   buttonContainer: {
-    marginTop: 10,
+    marginTop: 20,
     flexBasis: "auto",
     flexShrink: 1,
     flexDirection: "row",

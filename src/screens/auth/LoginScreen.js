@@ -39,7 +39,7 @@ export default function LoginScreen({ navigation }) {
       // get user from collection
       const user = await getDoc(doc(db, "users", id));
 
-      setUser({ ...user.data(), isNgo });
+      setUser(user.data());
     } catch (error) {
       console.log(error);
     }
@@ -93,6 +93,33 @@ export default function LoginScreen({ navigation }) {
           />
           <Text>SAR team login</Text>
         </View>
+        {isNgo && (
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              backgroundColor: "#e6b800",
+              paddingHorizontal: 5,
+              paddingVertical: 10,
+              borderRadius: 10,
+            }}
+          >
+            <IconButton
+              icon="information"
+              size={15}
+              mode="outlined"
+              iconColor="black"
+            />
+            <Text
+              variant="bodySmall"
+              style={{
+                flexShrink: 1,
+              }}
+            >
+              This option presents the App from a SAR team member's perspective.
+            </Text>
+          </View>
+        )}
         <Button
           style={style.signInButton}
           onPress={handleLogin}
@@ -110,28 +137,6 @@ export default function LoginScreen({ navigation }) {
       >
         New Here? Sign Up
       </Button>
-      <View
-        style={{
-          alignSelf: "flex-end",
-          flexDirection: "row",
-          alignItems: "center",
-          backgroundColor: "#E8DEF8",
-          paddingHorizontal: 5,
-          paddingVertical: 10,
-          borderRadius: 10,
-        }}
-      >
-        <IconButton icon="information" size={15} mode="outlined" />
-        <Text
-          variant="bodySmall"
-          style={{
-            flexShrink: 1,
-          }}
-        >
-          Use the information button to learn how to assist the victim & wait
-          for the authorites arrive!
-        </Text>
-      </View>
     </SafeAreaView>
   );
 }
