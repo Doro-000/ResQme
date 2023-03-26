@@ -13,6 +13,8 @@ import VictimDetail from "../../common/VictimDetail";
 
 import { useStoreState } from "easy-peasy";
 
+import { geoFire } from "@firebaseConfig";
+
 export default function Calm({ navigation }) {
   const [victims, setVictims] = useState([]);
   const [selectedVictim, setSelectedVictim] = useState(null);
@@ -28,6 +30,8 @@ export default function Calm({ navigation }) {
   const bottomSheetRef = useRef(null);
 
   const getVictims = async () => {
+    // const points =
+
     const points = new Promise((resolve) => {
       return resolve([
         {
@@ -330,13 +334,12 @@ export default function Calm({ navigation }) {
             longitude: 8.70203430116438,
           },
         },
-
-        // {
-        //   latlng: { latitude: 53.17167033346971, longitude: 8.656929163755606 },
-        //   title: "Abebe",
-        //   description: "Click to see more details !",
-        //   id: "1",
-        // },
+        {
+          latlng: { latitude: 53.17167033346971, longitude: 8.656929163755606 },
+          title: "Abebe",
+          description: "Click to see more details !",
+          id: "1",
+        },
       ]);
     });
 

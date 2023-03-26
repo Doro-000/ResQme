@@ -6,22 +6,42 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   ScrollView,
+  Switch,
 } from "react-native";
 import { useHeaderHeight } from "@react-navigation/elements";
 
-import { useStoreState } from "easy-peasy";
+import { useStoreState, useStoreActions } from "easy-peasy";
+
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "@firebaseConfig";
 
 export default function Profile() {
   const { user } = useStoreState((s) => s);
+  const { setUser } = useStoreActions((a) => a);
 
   const [isEditing, setEditing] = useState(false);
   const height = useHeaderHeight();
 
   const [email, setEmail] = useState(user.email);
   const [name, setName] = useState(user.name);
+  const [isNgo, setIsNgo] = useState(user.isNgo);
 
   const toggleEdit = () => {
-    setEditing(isEditing ^ true);
+    setEditing(!isEditing);
+  };
+
+  const updateProfile = async () => {
+    const updatedUser = {
+      email,
+      name,
+      isNgo,
+    };
+
+    const userDoc = doc(db, "users", user.id);
+    await updateDoc(userDoc, updatedUser);
+
+    setUser({ ...updatedUser, id: user.id });
+    toggleEdit();
   };
 
   return (
@@ -49,15 +69,11 @@ export default function Profile() {
           <View style={style.profileInfoHeader}>
             <Text>Profile Information</Text>
             {isEditing ? (
-              <Button
-                icon="check-bold"
-                mode="text"
-                onPress={() => toggleEdit()}
-              >
+              <Button icon="check-bold" mode="text" onPress={updateProfile}>
                 Save
               </Button>
             ) : (
-              <Button icon="pencil" mode="text" onPress={() => toggleEdit()}>
+              <Button icon="pencil" mode="text" onPress={toggleEdit}>
                 Edit
               </Button>
             )}
@@ -78,6 +94,23 @@ export default function Profile() {
             disabled={!isEditing}
             value={name}
           ></TextInput>
+
+          <View
+            style={{
+              paddingHorizontal: 1,
+              alignItems: "center",
+              flexDirection: "row",
+            }}
+          >
+            <Text>SAR Mode</Text>
+            <Switch
+              value={isNgo}
+              onValueChange={() => {
+                setIsNgo(!isNgo);
+              }}
+              disabled={!isEditing}
+            />
+          </View>
         </View>
       </KeyboardAvoidingView>
     </ScrollView>

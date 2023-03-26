@@ -5,7 +5,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { NavigationContainer } from "@react-navigation/native";
 
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "../../../firebaseConfig";
+import { db } from "@firebaseConfig";
 
 import { Panic, Calm } from "./victim/HomeScreen";
 import CustomNavigationBar from "./common/CustomNavigationBar";

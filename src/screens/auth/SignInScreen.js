@@ -15,7 +15,7 @@ import LottieView from "lottie-react-native";
 
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { collection, doc, setDoc } from "firebase/firestore";
-import { auth, db } from "../../../firebaseConfig";
+import { auth, db } from "@firebaseConfig";
 
 export default function SignUpScreen({ navigation }) {
   const [email, setEmail] = useState("");

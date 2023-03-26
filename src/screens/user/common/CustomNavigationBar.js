@@ -12,11 +12,11 @@ import {
 
 import { StackActions } from "@react-navigation/native";
 
-import { useStoreActions } from "easy-peasy";
+import { useStoreActions, useStoreState } from "easy-peasy";
 
 import { StyleSheet } from "react-native";
 import { signOut as fireBaseSignOut } from "firebase/auth";
-import { auth } from "../../../../firebaseConfig";
+import { auth, geoFire } from "@firebaseConfig";
 
 const { Header, Content, Action } = Appbar;
 
@@ -27,8 +27,11 @@ export default function CustomNavigationBar({ navigation }) {
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
 
+  const user = useStoreState((state) => state.user);
+
   const signOut = async () => {
     try {
+      await geoFire.remove(user.id); // stop tracking on panic exit
       await fireBaseSignOut(auth);
       logout();
     } catch (error) {

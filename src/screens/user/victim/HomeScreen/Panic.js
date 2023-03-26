@@ -1,15 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import { Audio } from "expo-av";
 
-import { FAB, Text, Banner } from "react-native-paper";
-import { StyleSheet, View } from "react-native";
+import { FAB, Text, Banner, IconButton } from "react-native-paper";
+import { StyleSheet, View, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import * as Location from "expo-location";
 import { useStoreActions, useStoreState } from "easy-peasy";
 
-import { geoFire } from "../../../../../firebaseConfig";
+import { geoFire } from "@firebaseConfig";
+
+import Carousel from "react-native-snap-carousel";
 
 export default function Panic({ navigation }) {
   const [sound, setSound] = useState(null);
@@ -66,6 +68,42 @@ export default function Panic({ navigation }) {
     navigation.navigate("Calm");
   }
 
+  const helpImages = [
+    require("@assets/victimPage1.jpeg"),
+    require("@assets/victimPage2.jpeg"),
+    require("@assets/victimPage3.jpeg"),
+    require("@assets/victimPage4.jpeg"),
+  ];
+
+  const renderCarouselImage = (value, index) => {
+    return (
+      <View
+        style={{
+          shadowColor: "black",
+          shadowOffset: { width: -2, height: 4 },
+          shadowOpacity: 0.2,
+          shadowRadius: 10,
+          paddingTop: 10,
+          elevation: 5,
+          marginBottom: 12,
+          borderRadius: 50,
+        }}
+      >
+        <Image
+          source={value.item}
+          style={{
+            borderRadius: 50,
+            borderWidth: 5,
+            backgroundColor: "white",
+            resizeMode: "cover",
+            width: "100%",
+            height: "100%",
+          }}
+        />
+      </View>
+    );
+  };
+
   useEffect(() => {
     sendLocation();
     return sound
@@ -92,8 +130,47 @@ export default function Panic({ navigation }) {
         </Text>
       </Banner>
       <View style={style.content}>
-        <View>
-          <Text>Help is on the way...</Text>
+        <View
+          style={{
+            height: "70%",
+            marginBottom: "auto",
+            marginTop: "10%",
+            gap: 15,
+          }}
+        >
+          <Carousel
+            data={helpImages}
+            renderItem={renderCarouselImage}
+            sliderWidth={375}
+            itemWidth={300}
+            loop
+          />
+          <View
+            style={{
+              flexDirection: "row",
+              alignSelf: "center",
+              alignItems: "center",
+              backgroundColor: "#e6b800",
+              paddingHorizontal: 35,
+              paddingVertical: 10,
+              borderRadius: 10,
+            }}
+          >
+            <IconButton
+              icon="information"
+              size={15}
+              mode="outlined"
+              iconColor="black"
+            />
+            <Text
+              variant="bodySmall"
+              style={{
+                flexShrink: 1,
+              }}
+            >
+              Help is on the way !
+            </Text>
+          </View>
         </View>
         <FAB
           icon={"bell-alert"}

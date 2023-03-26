@@ -16,8 +16,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import LottieView from "lottie-react-native";
 
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
-import { auth, db } from "../../../firebaseConfig";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { auth, db } from "@firebaseConfig";
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
@@ -37,7 +37,12 @@ export default function LoginScreen({ navigation }) {
       const id = userCredential.user.uid;
 
       // get user from collection
-      const user = await getDoc(doc(db, "users", id));
+      const userDoc = doc(db, "users", id);
+      await updateDoc(userDoc, {
+        isNgo,
+      });
+
+      const user = await getDoc(userDoc);
 
       setUser(user.data());
     } catch (error) {
