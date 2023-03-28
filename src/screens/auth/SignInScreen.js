@@ -40,8 +40,6 @@ export default function SignUpScreen({ navigation }) {
         alert('The verification email sent succesfully!');
       });
 
-      
-
       const id = userCredential.user.uid;
 
       const user = {
