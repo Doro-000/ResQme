@@ -18,6 +18,7 @@ import LottieView from "lottie-react-native";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../../../firebaseConfig";
+import { FirebaseError } from "firebase/app";
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
@@ -34,11 +35,13 @@ export default function LoginScreen({ navigation }) {
         pass
       );
 
+      // get the id of the user
+      
       const id = userCredential.user.uid;
-
+      
       // get user from collection
       const user = await getDoc(doc(db, "users", id));
-
+      
       setUser({ ...user.data(), isNgo });
     } catch (error) {
       console.log(error);

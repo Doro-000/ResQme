@@ -8,7 +8,7 @@ import PhoneInput from "react-native-phone-number-input";
 
 import LottieView from "lottie-react-native";
 
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import { collection, doc, setDoc } from "firebase/firestore";
 import { auth, db } from "../../../firebaseConfig";
 
@@ -31,6 +31,16 @@ export default function SignUpScreen({ navigation }) {
         email,
         pass
       );
+
+      // implement a popup for the function below to say that the email has been sent
+      // the verification email has been sent succesfully
+      await sendEmailVerification(
+        userCredential.user
+      ).then(() => {
+        alert('The verification email sent succesfully!');
+      });
+
+      
 
       const id = userCredential.user.uid;
 
