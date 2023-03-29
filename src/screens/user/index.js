@@ -1,35 +1,21 @@
-import React, { useEffect } from "react";
-import { useStoreActions, useStoreState } from "easy-peasy";
+import React from "react";
+import { useStoreState } from "easy-peasy";
 
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { NavigationContainer } from "@react-navigation/native";
 
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "@firebaseConfig";
-
-import { Panic, Calm } from "./victim/HomeScreen";
-import CustomNavigationBar from "./common/CustomNavigationBar";
-import Profile from "./common/Profile";
+import { Panic, Calm, Profile } from "./userScreens";
+import CustomNavigationBar from "./components/CustomNavigationBar";
 
 const { Navigator, Screen } = createNativeStackNavigator();
 
-export default function UserStack({ uid }) {
-  const setUser = useStoreActions((actions) => actions.setUser);
-
-  const getUserInfo = async (uid) => {
-    const userDoc = doc(db, "users", uid);
-    const userInfo = await getDoc(userDoc);
-    setUser(userInfo.data());
-  };
-
-  useEffect(() => {
-    getUserInfo(uid);
-  }, [uid]);
+export default function UserStack({ hideSplash }) {
+  const { user } = useStoreState((s) => s);
 
   return (
-    <NavigationContainer>
+    <NavigationContainer onReady={hideSplash}>
       <Navigator
-        initialRouteName="Calm"
+        initialRouteName={user.panicMode ? "Panic" : "Calm"}
         screenOptions={{
           header: (props) => <CustomNavigationBar {...props} />,
         }}

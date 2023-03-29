@@ -56,14 +56,14 @@ export default function Profile() {
           <View style={style.profilePic}>
             <Avatar.Image size={200} source={require("@assets/lego.png")} />
           </View>
-          <Button
+          {/* <Button
             icon="camera"
             mode="text"
             onPress={() => {}}
             style={style.profilePicButton}
           >
             Change Profile Picture
-          </Button>
+          </Button> */}
         </View>
         <View style={[style.profileSection, style.cards]}>
           <View style={style.profileInfoHeader}>

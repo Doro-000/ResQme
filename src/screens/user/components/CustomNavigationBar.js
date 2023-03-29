@@ -16,7 +16,10 @@ import { useStoreActions, useStoreState } from "easy-peasy";
 
 import { StyleSheet } from "react-native";
 import { signOut as fireBaseSignOut } from "firebase/auth";
-import { auth, geoFire } from "@firebaseConfig";
+import { doc, updateDoc } from "firebase/firestore";
+import { auth, rdb, db } from "@firebaseConfig";
+
+import { ref, remove } from "firebase/database";
 
 const { Header, Content, Action } = Appbar;
 
@@ -27,11 +30,15 @@ export default function CustomNavigationBar({ navigation }) {
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
 
-  const user = useStoreState((state) => state.user);
+  const { user } = useStoreState((s) => s);
 
   const signOut = async () => {
     try {
-      await geoFire.remove(user.id); // stop tracking on panic exit
+      await remove(ref(rdb, `locations/${user.id}`)); // stop tracking on panic exit
+
+      const userDoc = doc(db, "users", user.id); // turn off panic mode
+      await updateDoc(userDoc, { panicMode: false });
+
       await fireBaseSignOut(auth);
       logout();
     } catch (error) {
@@ -44,9 +51,7 @@ export default function CustomNavigationBar({ navigation }) {
       <Content
         title="⛑ ResQme"
         onPress={() => {
-          if (navigation.canGoBack()) {
-            navigation.dispatch(StackActions.popToTop());
-          }
+          navigation.navigate("Calm");
         }}
       />
       <Action

@@ -1,6 +1,3 @@
-// REACT
-import * as React from "react";
-
 // PAPER
 import { Provider as PaperProvider } from "react-native-paper";
 

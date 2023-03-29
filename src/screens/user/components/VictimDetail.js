@@ -16,13 +16,26 @@ import Carousel from "react-native-snap-carousel";
 
 import { useStoreState } from "easy-peasy";
 
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@firebaseConfig";
+
+import { DateTime } from "luxon";
+
+import { isEmpty } from "lodash";
+
+import { randNumber } from "@ngneat/falso";
+
+import { GOOGLE_mapKey } from "@env";
+
 const VictimDetail = ({
   bottomSheetRef,
-  currentVictim,
+  victimData,
+  sampleVictim,
   changeBottomSheetActive,
   backDrop,
 }) => {
   const [victim, setVictim] = useState(null);
+  const [loading, setLoading] = useState(null);
 
   const [helpModal, setHelpModal] = useState(false);
 
@@ -32,35 +45,41 @@ const VictimDetail = ({
   const { user } = useStoreState((s) => s);
 
   const getVictimData = async () => {
-    const data = new Promise((resolve) => {
-      if (currentVictim === 1) {
-        return resolve({
+    if (!isEmpty(victimData)) {
+      if (sampleVictim) {
+        setVictim({
           profilePicture: require("@assets/lego.png"),
-          name: "abebe",
-          phone: "+491744818011",
-          lastSeen: "10 seconds ago",
+          name: victimData.title,
+          phone: victimData.phone,
+          lastSeen: victimData.lastSeen,
+          bpm: victimData.bpm,
           location: {
-            latitude: 53.17167033346971,
-            longitude: 8.656929163755606,
+            latitude: victimData.latlng.latitude,
+            longitude: victimData.latlng.longitude,
           },
+          locationName: await getLocationName(victimData.latlng),
         });
       } else {
-        return resolve({
-          profilePicture: require("@assets/lego.png"),
-          name: "abebech",
-          phone: "+491744818012",
-          lastSeen: "10 seconds ago",
-          location: {
-            latitude: 53.161143478761694,
-            longitude: 8.646358017780486,
-          },
-        });
-      }
-    });
+        setLoading(true);
+        const userDoc = doc(db, "users", victimData.id);
+        const userInfo = (await getDoc(userDoc)).data();
 
-    setTimeout(async () => {
-      setVictim(await data);
-    }, 200);
+        const lastSeen = DateTime.fromMillis(victimData.lastSeen);
+        setVictim({
+          profilePicture: require("@assets/lego.png"),
+          name: victimData.title,
+          phone: userInfo.phone,
+          lastSeen: lastSeen.toRelative(),
+          bpm: `${randNumber({ min: 80, max: 150 })} bpm`,
+          location: {
+            latitude: victimData.latlng.latitude,
+            longitude: victimData.latlng.longitude,
+          },
+          locationName: await getLocationName(victimData.latlng),
+        });
+        setLoading(false);
+      }
+    }
   };
 
   const snapPoints = useMemo(() => ["50%"], []);
@@ -74,7 +93,7 @@ const VictimDetail = ({
 
   useEffect(() => {
     getVictimData();
-  }, [currentVictim]);
+  }, [victimData]);
 
   const helpImages = [
     require("@assets/volunteerPage1.jpeg"),
@@ -82,7 +101,30 @@ const VictimDetail = ({
     require("@assets/volunteerPage3.jpeg"),
   ];
 
-  const renderCarouselImage = (value, index) => {
+  async function getLocationName(latlng) {
+    setLoading(true);
+    try {
+      let name = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${[
+          latlng.latitude,
+          latlng.longitude,
+        ].join(",")}&key=${GOOGLE_mapKey}`
+      );
+
+      name = await name.json();
+      if (name.status !== "OK") {
+        return "Error fetching location Name !";
+      }
+      return name.results[0].formatted_address;
+    } catch (e) {
+      console.warn(e);
+      return "Error fetching location Name !";
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const renderCarouselImage = (value) => {
     return (
       <View
         style={{
@@ -170,7 +212,9 @@ const VictimDetail = ({
                 <View style={[styles.sectionCard, styles.ngoInfoCard]}>
                   <View style={styles.victimInfoItem}>
                     <AntDesign name="pushpino" size={20} />
-                    <Text numberOfLines={1}>{"Somewhere"}</Text>
+                    <Text numberOfLines={1}>
+                      {loading ? "Fetching Location Name" : victim.locationName}
+                    </Text>
                   </View>
                   <View style={styles.victimInfoItem}>
                     <AntDesign name="find" size={20} />
@@ -178,13 +222,13 @@ const VictimDetail = ({
                   </View>
                   <View style={styles.victimInfoItem}>
                     <Ionicons name="pulse" size={24} color="black" />
-                    <Text>60 - 100 bpm</Text>
+                    <Text>{victim.bpm}</Text>
                   </View>
                 </View>
 
                 <Button
                   icon="bell-alert"
-                  mode="contained-tonal"
+                  mode="contained"
                   style={{
                     marginTop: 10,
                     height: "15%",

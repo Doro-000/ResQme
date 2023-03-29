@@ -8,9 +8,9 @@ import LoginScreen from "./LoginScreen";
 
 const { Navigator, Screen } = createNativeStackNavigator();
 
-export default function AuthStack() {
+export default function AuthStack({ hideSplash }) {
   return (
-    <NavigationContainer>
+    <NavigationContainer onReady={hideSplash}>
       <Navigator
         screenOptions={{ headerShown: false }}
         initialRouteName={"login"}

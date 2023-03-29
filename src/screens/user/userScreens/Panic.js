@@ -9,9 +9,14 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import * as Location from "expo-location";
 import { useStoreActions, useStoreState } from "easy-peasy";
 
-import { geoFire } from "@firebaseConfig";
+import { ref, set, update, remove } from "firebase/database";
+import { doc, updateDoc } from "firebase/firestore";
+import { rdb, db } from "@firebaseConfig";
 
 import Carousel from "react-native-snap-carousel";
+
+import { pick } from "lodash";
+import { DateTime } from "luxon";
 
 export default function Panic({ navigation }) {
   const [sound, setSound] = useState(null);
@@ -20,7 +25,11 @@ export default function Panic({ navigation }) {
   const setLocation = useStoreActions((actions) => actions.setLocation);
   const location = useStoreState((state) => state.location);
 
-  const user = useStoreState((state) => state.user);
+  const { user } = useStoreState((s) => s);
+  const { setUser } = useStoreActions((a) => a);
+
+  const rdbRef = ref(rdb, `locations/${user.id}`);
+  const userDoc = doc(db, "users", user.id);
 
   async function playSound() {
     const { granted } = await Audio.requestPermissionsAsync();
@@ -43,7 +52,11 @@ export default function Panic({ navigation }) {
 
   async function sendLocation() {
     // set initial location
-    await geoFire.set(user.id, [location.latitude, location.longitude]);
+    await set(rdbRef, {
+      ...pick(user, ["id", "name"]),
+      latlng: [location.latitude, location.longitude],
+      lastSeen: DateTime.now().valueOf(),
+    });
 
     await Location.watchPositionAsync(
       {
@@ -54,16 +67,28 @@ export default function Panic({ navigation }) {
         setLocation(location.coords);
 
         // update every 3 minutes
-        await geoFire.set(user.id, [
-          location.coords.latitude,
-          location.coords.longitude,
-        ]);
+        await update(rdbRef, {
+          latlng: {
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+          },
+        });
       }
     );
   }
 
+  async function setPanicMode() {
+    await updateDoc(userDoc, { panicMode: true });
+    setUser({ ...user, panicMode: true });
+  }
+
   async function exitPanic() {
-    await geoFire.remove(user.id); // stop tracking on panic exit
+    await remove(rdbRef); // stop tracking on panic exit
+
+    const userDoc = doc(db, "users", user.id); // turn off panic mode
+    await updateDoc(userDoc, { panicMode: false });
+
+    setUser({ ...user, panicMode: false });
 
     navigation.navigate("Calm");
   }
@@ -106,6 +131,10 @@ export default function Panic({ navigation }) {
 
   useEffect(() => {
     sendLocation();
+    setPanicMode();
+  }, []);
+
+  useEffect(() => {
     return sound
       ? () => {
           sound.unloadAsync();
