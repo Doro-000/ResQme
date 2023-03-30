@@ -9,26 +9,15 @@ import { getFirestore } from "firebase/firestore";
 import { getDatabase } from "firebase/database";
 import { getFunctions } from "firebase/functions";
 
-import {
-  FIREBASE_apiKey,
-  FIREBASE_authDomain,
-  FIREBASE_projectId,
-  FIREBASE_storageBucket,
-  FIREBASE_messagingSenderId,
-  FIREBASE_appId,
-  FIREBASE_measurementId,
-  FIREBASE_databaseURL,
-} from "@env";
-
 const firebaseConfig = {
-  apiKey: FIREBASE_apiKey,
-  authDomain: FIREBASE_authDomain,
-  projectId: FIREBASE_projectId,
-  storageBucket: FIREBASE_storageBucket,
-  messagingSenderId: FIREBASE_messagingSenderId,
-  appId: FIREBASE_appId,
-  measurementId: FIREBASE_measurementId,
-  databaseURL: FIREBASE_databaseURL,
+  apiKey: process.env.FIREBASE_apiKey,
+  authDomain: process.env.FIREBASE_authDomain,
+  projectId: process.env.FIREBASE_projectId,
+  storageBucket: process.env.FIREBASE_storageBucket,
+  messagingSenderId: process.env.FIREBASE_messagingSenderId,
+  appId: process.env.FIREBASE_appId,
+  measurementId: process.env.FIREBASE_measurementId,
+  databaseURL: process.env.FIREBASE_databaseURL,
 };
 
 // Initialize Firebase
@@ -37,7 +26,7 @@ const auth = initializeAuth(app, {
   persistence: getReactNativePersistence(AsyncStorage),
 });
 const db = getFirestore(app);
-const rdb = getDatabase(app, FIREBASE_databaseURL);
+const rdb = getDatabase(app);
 const funcs = getFunctions(app);
 
 export { app, db, auth, rdb, funcs };
