@@ -38,7 +38,8 @@ const VictimDetail = ({
 }) => {
   // State
   const [victim, setVictim] = useState(null);
-  const [loading, setLoading] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [detailLoading, setDetailLoading] = useState(false);
   const [helpModal, setHelpModal] = useState(false);
 
   const { user } = useStoreState((s) => s);
@@ -57,6 +58,7 @@ const VictimDetail = ({
 
   // funcs
   const getVictimData = async () => {
+    setDetailLoading(true);
     if (!isEmpty(victimData)) {
       if (sampleVictim) {
         setVictim({
@@ -72,7 +74,6 @@ const VictimDetail = ({
           locationName: await getLocationName(victimData.latlng),
         });
       } else {
-        setLoading(true);
         const userDoc = doc(db, "users", victimData.id);
         const userInfo = (await getDoc(userDoc)).data();
 
@@ -89,9 +90,9 @@ const VictimDetail = ({
           },
           locationName: await getLocationName(victimData.latlng),
         });
-        setLoading(false);
       }
     }
+    setDetailLoading(false);
   };
 
   async function getLocationName(latlng) {
@@ -165,125 +166,138 @@ const VictimDetail = ({
       backdropComponent={backDrop}
     >
       <BottomSheetView style={styles.contentContainer}>
-        {victim ? (
+        {detailLoading ? (
+          <Text style={{ textAlign: "center" }}>Loading...</Text>
+        ) : (
           <>
-            <View style={styles.sectionCard}>
-              <View style={styles.victimPic}>
-                <Avatar.Image size={75} source={victim.profilePicture} />
-              </View>
-              <View style={styles.victimInfo}>
-                <View style={styles.victimInfoItem}>
-                  <AntDesign name="user" size={20} />
-                  <Text>{victim.name}</Text>
-                </View>
-                <View style={styles.victimInfoItem}>
-                  <AntDesign name="clockcircleo" size={24} color="black" />
-                  <Text>{victim.lastSeen}</Text>
-                </View>
-              </View>
-              <View>
-                <IconButton
-                  icon="phone"
-                  mode="contained"
-                  style={{
-                    alignSelf: "center",
-                  }}
-                  onPress={() => {
-                    Linking.openURL(`tel:${victim.phone}`);
-                  }}
-                />
-                {user.isNgo && (
-                  <IconButton
-                    icon={"directions"}
-                    mode="contained"
-                    style={{
-                      alignSelf: "center",
-                    }}
-                    onPress={() => {
-                      Linking.openURL(
-                        `geo:0,0?q=${victim.location.latitude},${victim.location.longitude}`
-                      );
-                    }}
-                  />
-                )}
-              </View>
-            </View>
-            {user.isNgo ? (
+            {victim ? (
               <>
-                <View style={[styles.sectionCard, styles.ngoInfoCard]}>
-                  <View style={styles.victimInfoItem}>
-                    <AntDesign name="pushpino" size={20} />
-                    <Text numberOfLines={1}>
-                      {loading ? "Fetching Location Name" : victim.locationName}
-                    </Text>
+                <View style={styles.sectionCard}>
+                  <View style={styles.victimPic}>
+                    <Avatar.Image size={75} source={victim.profilePicture} />
                   </View>
-                  <View style={styles.victimInfoItem}>
-                    <AntDesign name="find" size={20} />
-                    <Text>{`${victim?.location.latitude}, ${victim?.location.longitude}`}</Text>
+                  <View style={styles.victimInfo}>
+                    <View style={styles.victimInfoItem}>
+                      <AntDesign name="user" size={20} />
+                      <Text>{victim.name}</Text>
+                    </View>
+                    <View style={styles.victimInfoItem}>
+                      <AntDesign name="clockcircleo" size={24} color="black" />
+                      <Text>{victim.lastSeen}</Text>
+                    </View>
                   </View>
-                  <View style={styles.victimInfoItem}>
-                    <Ionicons name="pulse" size={24} color="black" />
-                    <Text>{victim.bpm}</Text>
-                  </View>
-                </View>
-
-                <Button
-                  icon="bell-alert"
-                  mode="contained"
-                  style={{
-                    marginTop: 10,
-                    height: "15%",
-                    justifyContent: "center",
-                  }}
-                >
-                  Press Here to make the victims phone ring !
-                </Button>
-              </>
-            ) : (
-              <>
-                <View style={[styles.sectionCard, styles.actionButton]}>
                   <View>
                     <IconButton
-                      icon="information"
+                      icon="phone"
                       mode="contained"
-                      size={50}
-                      onPress={openHelpModal}
-                    />
-                    <Text> How to help ?</Text>
-                  </View>
-
-                  <View>
-                    <IconButton
-                      icon="directions"
-                      size={50}
-                      mode="contained"
+                      style={{
+                        alignSelf: "center",
+                      }}
                       onPress={() => {
-                        Linking.openURL(
-                          `geo:0,0?q=${victim.location.latitude},${victim.location.longitude}`
-                        );
+                        Linking.openURL(`tel:${victim.phone}`);
                       }}
                     />
-                    <Text> Directions</Text>
+                    {user.isNgo && (
+                      <IconButton
+                        icon={"directions"}
+                        mode="contained"
+                        style={{
+                          alignSelf: "center",
+                        }}
+                        onPress={() => {
+                          Linking.openURL(
+                            `geo:0,0?q=${victim.location.latitude},${victim.location.longitude}`
+                          );
+                        }}
+                      />
+                    )}
                   </View>
                 </View>
-                <View style={[styles.sectionCard, styles.infoCard]}>
-                  <IconButton icon="information" size={15} mode="outlined" />
-                  <Text
-                    variant="bodySmall"
-                    style={{
-                      flexShrink: 1,
-                    }}
-                  >
-                    Use the information button to learn how to assist the victim
-                    & wait for the authorites arrive!
-                  </Text>
-                </View>
+                {user.isNgo ? (
+                  <>
+                    <View style={[styles.sectionCard, styles.ngoInfoCard]}>
+                      <View style={styles.victimInfoItem}>
+                        <AntDesign name="pushpino" size={20} />
+                        <Text numberOfLines={1}>
+                          {loading
+                            ? "Fetching Location Name"
+                            : victim.locationName}
+                        </Text>
+                      </View>
+                      <View style={styles.victimInfoItem}>
+                        <AntDesign name="find" size={20} />
+                        <Text>{`${victim?.location.latitude}, ${victim?.location.longitude}`}</Text>
+                      </View>
+                      <View style={styles.victimInfoItem}>
+                        <Ionicons name="pulse" size={24} color="black" />
+                        <Text>{victim.bpm}</Text>
+                      </View>
+                    </View>
+
+                    <Button
+                      icon="bell-alert"
+                      mode="contained"
+                      style={{
+                        marginTop: 10,
+                        height: "15%",
+                        justifyContent: "center",
+                      }}
+                    >
+                      Press Here to make the victims phone ring !
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <View style={[styles.sectionCard, styles.actionButton]}>
+                      <View>
+                        <IconButton
+                          icon="information"
+                          mode="contained"
+                          size={50}
+                          onPress={openHelpModal}
+                        />
+                        <Text> How to help ?</Text>
+                      </View>
+
+                      <View>
+                        <IconButton
+                          icon="directions"
+                          size={50}
+                          mode="contained"
+                          onPress={() => {
+                            Linking.openURL(
+                              `geo:0,0?q=${victim.location.latitude},${victim.location.longitude}`
+                            );
+                          }}
+                        />
+                        <Text> Directions</Text>
+                      </View>
+                    </View>
+                    <View style={[styles.sectionCard, styles.infoCard]}>
+                      <IconButton
+                        icon="information"
+                        size={15}
+                        mode="outlined"
+                      />
+                      <Text
+                        variant="bodySmall"
+                        style={{
+                          flexShrink: 1,
+                        }}
+                      >
+                        Use the information button to learn how to assist the
+                        victim & wait for the authorites arrive!
+                      </Text>
+                    </View>
+                  </>
+                )}
               </>
+            ) : (
+              <Text>Please select a victim from the map !</Text>
             )}
           </>
-        ) : (
-          <Text>Please select a victim from the map !</Text>
         )}
+
         <Portal>
           <Modal
             visible={helpModal}
