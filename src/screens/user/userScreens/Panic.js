@@ -1,36 +1,47 @@
+// React
 import { useState, useEffect, useRef } from "react";
 
+// EXPO
 import { Audio } from "expo-av";
+import * as Location from "expo-location";
 
+// UI
 import { FAB, Text, Banner, IconButton } from "react-native-paper";
 import { StyleSheet, View, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Carousel from "react-native-snap-carousel";
 
-import * as Location from "expo-location";
+// State
 import { useStoreActions, useStoreState } from "easy-peasy";
 
+// Firebase
 import { ref, set, update, remove } from "firebase/database";
 import { doc, updateDoc } from "firebase/firestore";
 import { rdb, db } from "@firebaseConfig";
 
-import Carousel from "react-native-snap-carousel";
-
+// Utils
 import { pick } from "lodash";
 import { DateTime } from "luxon";
 
 export default function Panic({ navigation }) {
+  // State
   const [sound, setSound] = useState(null);
   const [_, setErrorMsg] = useState(null);
+  const { user, location } = useStoreState((s) => s);
+  const { setUser, setLocation } = useStoreActions((a) => a);
 
-  const setLocation = useStoreActions((actions) => actions.setLocation);
-  const location = useStoreState((state) => state.location);
-
-  const { user } = useStoreState((s) => s);
-  const { setUser } = useStoreActions((a) => a);
-
+  // constants
   const rdbRef = ref(rdb, `locations/${user.id}`);
   const userDoc = doc(db, "users", user.id);
 
+  const helpImages = [
+    require("@assets/victimPage1.jpeg"),
+    require("@assets/victimPage2.jpeg"),
+    require("@assets/victimPage3.jpeg"),
+    require("@assets/victimPage4.jpeg"),
+  ];
+
+  // funcs
   async function playSound() {
     const { granted } = await Audio.requestPermissionsAsync();
 
@@ -93,13 +104,6 @@ export default function Panic({ navigation }) {
     navigation.navigate("Calm");
   }
 
-  const helpImages = [
-    require("@assets/victimPage1.jpeg"),
-    require("@assets/victimPage2.jpeg"),
-    require("@assets/victimPage3.jpeg"),
-    require("@assets/victimPage4.jpeg"),
-  ];
-
   const renderCarouselImage = (value, index) => {
     return (
       <View
@@ -129,6 +133,7 @@ export default function Panic({ navigation }) {
     );
   };
 
+  // UI
   useEffect(() => {
     sendLocation();
     setPanicMode();

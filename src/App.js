@@ -8,6 +8,7 @@ import store from "./state";
 // ROOT NAVIGATION
 import RootNavigator from "./screens";
 
+// GESTURE HANDLER for Bottom sheet
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 function App() {

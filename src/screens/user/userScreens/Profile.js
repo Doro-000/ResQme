@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
+// React
+import { useState } from "react";
 
+// UI
 import { Button, Avatar, TextInput, Text } from "react-native-paper";
 import {
   View,
@@ -10,25 +12,28 @@ import {
 } from "react-native";
 import { useHeaderHeight } from "@react-navigation/elements";
 
+// state
 import { useStoreState, useStoreActions } from "easy-peasy";
 
+// Firebase
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@firebaseConfig";
 
 export default function Profile({ navigation }) {
+  // State
   const { user } = useStoreState((s) => s);
   const { setUser } = useStoreActions((a) => a);
 
   const [isEditing, setEditing] = useState(false);
-  const height = useHeaderHeight();
-
   const [email, setEmail] = useState(user.email);
   const [name, setName] = useState(user.name);
   const [phoneNum, setPhoneNumber] = useState(user.phoneNum);
   const [isNgo, setIsNgo] = useState(user.isNgo);
-
   const [loading, setLoading] = useState(false);
 
+  const height = useHeaderHeight();
+
+  // Funcs
   const toggleEdit = () => {
     setEditing(!isEditing);
   };
@@ -57,6 +62,7 @@ export default function Profile({ navigation }) {
     }
   };
 
+  // UI
   return (
     <ScrollView>
       <KeyboardAvoidingView

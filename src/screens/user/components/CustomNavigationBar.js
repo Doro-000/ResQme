@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+// React
+import { useState } from "react";
 
+// UI
 import { View } from "react-native";
 import {
   Appbar,
@@ -9,21 +11,24 @@ import {
   Button,
   Divider,
 } from "react-native-paper";
+import { StyleSheet } from "react-native";
 
+// State
 import { useStoreActions, useStoreState } from "easy-peasy";
 
-import { StyleSheet } from "react-native";
+// Firebase
 import { signOut as fireBaseSignOut } from "firebase/auth";
 import { doc, updateDoc } from "firebase/firestore";
 import { auth, rdb, db } from "@firebaseConfig";
-
 import { ref, remove } from "firebase/database";
 
 const { Header, Content, Action } = Appbar;
-
 export default function CustomNavigationBar({ navigation }) {
+  // state
   const [visible, setVisible] = useState(false);
   const [infoVisible, setInfoVisible] = useState(false);
+
+  const { user } = useStoreState((s) => s);
   const { logout } = useStoreActions((a) => a);
 
   const showModal = () => setVisible(true);
@@ -32,8 +37,7 @@ export default function CustomNavigationBar({ navigation }) {
   const showInfoModal = () => setInfoVisible(true);
   const hideInfoModal = () => setInfoVisible(false);
 
-  const { user } = useStoreState((s) => s);
-
+  // funcs
   const signOut = async () => {
     try {
       await remove(ref(rdb, `locations/${user.id}`)); // stop tracking on panic exit
@@ -48,6 +52,7 @@ export default function CustomNavigationBar({ navigation }) {
     }
   };
 
+  // UI
   return (
     <Header elevated>
       <Content

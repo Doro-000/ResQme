@@ -1,14 +1,18 @@
+// React
 import React from "react";
+
+// State
 import { useStoreState } from "easy-peasy";
 
+// Navigation
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { NavigationContainer } from "@react-navigation/native";
 
+// UI
 import { Panic, Calm, Profile } from "./userScreens";
 import CustomNavigationBar from "./components/CustomNavigationBar";
 
 const { Navigator, Screen } = createNativeStackNavigator();
-
 export default function UserStack({ hideSplash }) {
   const { user } = useStoreState((s) => s);
 

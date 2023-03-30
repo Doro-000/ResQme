@@ -1,4 +1,7 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+// React
+import { useCallback, useEffect, useMemo, useState } from "react";
+
+// UI
 import { View, StyleSheet, Linking, Image } from "react-native";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import {
@@ -11,20 +14,21 @@ import {
 } from "react-native-paper";
 import { AntDesign } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
-
 import Carousel from "react-native-snap-carousel";
 
+// State
 import { useStoreState } from "easy-peasy";
 
+// Firebase
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@firebaseConfig";
 
+// Utils
 import { DateTime } from "luxon";
-
 import { isEmpty } from "lodash";
-
 import { randNumber } from "@ngneat/falso";
 
+// env
 import { GOOGLE_mapKey } from "@env";
 
 const VictimDetail = ({
@@ -34,16 +38,26 @@ const VictimDetail = ({
   changeBottomSheetActive,
   backDrop,
 }) => {
+  // State
   const [victim, setVictim] = useState(null);
   const [loading, setLoading] = useState(null);
-
   const [helpModal, setHelpModal] = useState(false);
+
+  const { user } = useStoreState((s) => s);
 
   const openHelpModal = () => setHelpModal(true);
   const closeHelpModal = () => setHelpModal(false);
 
-  const { user } = useStoreState((s) => s);
+  // constants
+  const snapPoints = useMemo(() => ["50%"], []);
 
+  const helpImages = [
+    require("@assets/volunteerPage1.jpeg"),
+    require("@assets/volunteerPage2.jpeg"),
+    require("@assets/volunteerPage3.jpeg"),
+  ];
+
+  // funcs
   const getVictimData = async () => {
     if (!isEmpty(victimData)) {
       if (sampleVictim) {
@@ -81,25 +95,6 @@ const VictimDetail = ({
       }
     }
   };
-
-  const snapPoints = useMemo(() => ["50%"], []);
-
-  // callbacks
-  const handleSheetChanges = useCallback((index) => {
-    if (index === -1) {
-      changeBottomSheetActive(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    getVictimData();
-  }, [victimData]);
-
-  const helpImages = [
-    require("@assets/volunteerPage1.jpeg"),
-    require("@assets/volunteerPage2.jpeg"),
-    require("@assets/volunteerPage3.jpeg"),
-  ];
 
   async function getLocationName(latlng) {
     setLoading(true);
@@ -153,7 +148,17 @@ const VictimDetail = ({
     );
   };
 
-  // renders
+  const handleSheetChanges = useCallback((index) => {
+    if (index === -1) {
+      changeBottomSheetActive(false);
+    }
+  }, []);
+
+  // UI
+  useEffect(() => {
+    getVictimData();
+  }, [victimData]);
+
   return (
     <BottomSheet
       ref={bottomSheetRef}

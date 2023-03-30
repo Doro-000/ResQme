@@ -1,7 +1,7 @@
+// React
 import { useState } from "react";
 
 // UI
-// import MapView from "react-native-map-clustering";
 import MapView from "react-native-maps";
 import { StyleSheet, View } from "react-native";
 import {
@@ -19,12 +19,14 @@ export default function Map({
   layoutAnimation,
   refreshData,
 }) {
+  // State
   const [visible, setVisible] = useState(false);
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
 
   const [mapType, setMapType] = useState("standard");
 
+  // Ui
   return (
     <View>
       <MapView

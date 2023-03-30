@@ -1,37 +1,35 @@
-import React, {
-  useEffect,
-  useRef,
-  useState,
-  useCallback,
-  useMemo,
-} from "react";
+// React
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 
+// UI
 import { View, StyleSheet } from "react-native";
-import { SwipeButton } from "react-native-expo-swipe-button";
 import { MaterialIcons } from "@expo/vector-icons";
-import { Marker, Heatmap } from "react-native-maps";
+import { SwipeButton } from "react-native-expo-swipe-button";
 import { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
-
 import { SegmentedButtons } from "react-native-paper";
 
 import Map from "../components/Map";
 import VictimDetail from "../components/VictimDetail";
 
+// Map
+import { Marker, Heatmap } from "react-native-maps";
+
+// State
 import { useStoreState } from "easy-peasy";
 
+// Firebase
 import { rdb } from "@firebaseConfig";
 import { ref, get } from "firebase/database";
 
+// Utils
 import { randFullName } from "@ngneat/falso";
 import { isEmpty, values } from "lodash";
-
+import { randPhoneNumber, randNumber, randBetweenDate } from "@ngneat/falso";
+import { DateTime } from "luxon";
 import { useIsFocused } from "@react-navigation/native";
 
-import { randPhoneNumber, randNumber, randBetweenDate } from "@ngneat/falso";
-
-import { DateTime } from "luxon";
-
 export default function Calm({ navigation }) {
+  // State
   const isFocused = useIsFocused();
   const [victims, setVictims] = useState([]);
   const [currentVictimData, setCurrentVictimData] = useState(null);
@@ -41,9 +39,10 @@ export default function Calm({ navigation }) {
   const { user, location } = useStoreState((s) => s);
 
   const [mapMode, setMapMode] = useState("pin");
-
   const mapRef = useRef(null);
+  const bottomSheetRef = useRef(null);
 
+  // Generate Random Victims
   const randomVictims = useMemo(() => {
     if (!isEmpty(location)) {
       return [
@@ -55,6 +54,7 @@ export default function Calm({ navigation }) {
     return [];
   }, []);
 
+  // Funcs
   const updateVictims = async () => {
     const rdbRef = ref(rdb, "locations");
     const locations = await get(rdbRef);
@@ -80,9 +80,6 @@ export default function Calm({ navigation }) {
     setVictims(res);
   };
 
-  // Bottom sheet
-  const bottomSheetRef = useRef(null);
-
   const toggleBottomSheet = () => {
     if (bottomSheetActive) {
       bottomSheetRef.current.close();
@@ -98,6 +95,28 @@ export default function Calm({ navigation }) {
       longitude: latlng.longitude,
     }));
   };
+
+  const changeMapType = (value) => {
+    if (value === "pin") {
+      pinAnimation();
+    } else {
+      heatAnimation();
+    }
+    setMapMode(value);
+  };
+
+  const renderBackdrop = useCallback(
+    (props) => (
+      <BottomSheetBackdrop
+        {...props}
+        disappearsOnIndex={-1}
+        appearsOnIndex={1}
+        opacity={0.3}
+        rdbRef
+      />
+    ),
+    []
+  );
 
   // map Animations
   const pinAnimation = () => {
@@ -124,29 +143,7 @@ export default function Calm({ navigation }) {
     });
   };
 
-  const changeMapType = (value) => {
-    if (value === "pin") {
-      pinAnimation();
-    } else {
-      heatAnimation();
-    }
-    setMapMode(value);
-  };
-
-  // backdrop
-  const renderBackdrop = useCallback(
-    (props) => (
-      <BottomSheetBackdrop
-        {...props}
-        disappearsOnIndex={-1}
-        appearsOnIndex={1}
-        opacity={0.3}
-        rdbRef
-      />
-    ),
-    []
-  );
-
+  // UI
   useEffect(() => {
     if (isFocused) {
       updateVictims();

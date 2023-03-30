@@ -1,23 +1,25 @@
 // REACT
 import { useCallback, useEffect, useState } from "react";
 
+// Navigation stacks
 import AuthStack from "./auth";
 import UserStack from "./user";
 
+// EXPO
 import * as SplashScreen from "expo-splash-screen";
-
 import * as Location from "expo-location";
 
+// Firebase
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "@firebaseConfig";
-
-import { useStoreActions } from "easy-peasy";
-
+import { auth, db } from "@firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "@firebaseConfig";
+
+// State
+import { useStoreActions } from "easy-peasy";
 
 SplashScreen.preventAutoHideAsync();
 export default function RootNavigator() {
+  // state
   const [appIsReady, setAppIsReady] = useState(false);
   const [isAuthed, setIsAuthed] = useState("Idle");
   const [uid, setUid] = useState(null);
@@ -25,6 +27,7 @@ export default function RootNavigator() {
 
   const { setPermissions, setLocation, setUser } = useStoreActions((a) => a);
 
+  // funcs
   const getUserInfo = async (uid) => {
     const userDoc = doc(db, "users", uid);
     const userInfo = await getDoc(userDoc);
@@ -61,6 +64,13 @@ export default function RootNavigator() {
     }
   });
 
+  const onLayoutRootView = useCallback(async () => {
+    if (appIsReady) {
+      await SplashScreen.hideAsync();
+    }
+  }, [appIsReady]);
+
+  // UI
   useEffect(() => {
     async function prepare() {
       try {
@@ -79,12 +89,6 @@ export default function RootNavigator() {
 
     prepare();
   }, [isAuthed]);
-
-  const onLayoutRootView = useCallback(async () => {
-    if (appIsReady) {
-      await SplashScreen.hideAsync();
-    }
-  }, [appIsReady]);
 
   if (!appIsReady) {
     return null;
