@@ -2,7 +2,7 @@
 import { useState } from "react";
 
 // UI
-import MapView from "react-native-maps";
+import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
 import { StyleSheet, View } from "react-native";
 import {
   IconButton,
@@ -30,7 +30,7 @@ export default function Map({
   return (
     <View>
       <MapView
-        provider="google"
+        provider={PROVIDER_GOOGLE}
         style={styles.map}
         showsUserLocation={true}
         ref={mapRef}
