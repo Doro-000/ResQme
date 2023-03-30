@@ -48,7 +48,7 @@ export default function CustomNavigationBar({ navigation }) {
       await fireBaseSignOut(auth);
       logout();
     } catch (error) {
-      console.log(error);
+      console.warn(error);
     }
   };
 

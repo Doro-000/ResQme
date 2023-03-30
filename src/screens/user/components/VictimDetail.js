@@ -21,15 +21,13 @@ import { useStoreState } from "easy-peasy";
 
 // Firebase
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "@firebaseConfig";
+import { httpsCallable } from "firebase/functions";
+import { db, funcs } from "@firebaseConfig";
 
 // Utils
 import { DateTime } from "luxon";
 import { isEmpty } from "lodash";
 import { randNumber } from "@ngneat/falso";
-
-// env
-import { GOOGLE_mapKey } from "@env";
 
 const VictimDetail = ({
   bottomSheetRef,
@@ -99,14 +97,12 @@ const VictimDetail = ({
   async function getLocationName(latlng) {
     setLoading(true);
     try {
-      let name = await fetch(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${[
-          latlng.latitude,
-          latlng.longitude,
-        ].join(",")}&key=${GOOGLE_mapKey}`
-      );
+      let locationFunction = httpsCallable(funcs, "getLocationName");
+      let name = await locationFunction({
+        latlng: [latlng.latitude, latlng.longitude].join(","),
+      });
 
-      name = await name.json();
+      name = await name.data;
       if (name.status !== "OK") {
         return "Error fetching location Name !";
       }

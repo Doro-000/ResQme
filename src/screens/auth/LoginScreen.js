@@ -51,7 +51,7 @@ export default function LoginScreen({ navigation }) {
 
       setUser(user.data());
     } catch (error) {
-      console.log(error);
+      console.warn(error);
       if (
         error.code === "auth/wrong-password" ||
         error.code === "auth/user-not-found"
