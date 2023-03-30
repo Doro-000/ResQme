@@ -1,29 +1,68 @@
-import { useEffect, useState } from "react";
+// React
+import { useState } from "react";
 
+// UI
 import { Button, Avatar, TextInput, Text } from "react-native-paper";
 import {
   View,
   StyleSheet,
   KeyboardAvoidingView,
   ScrollView,
+  Switch,
 } from "react-native";
 import { useHeaderHeight } from "@react-navigation/elements";
 
-import { useStoreState } from "easy-peasy";
+// state
+import { useStoreState, useStoreActions } from "easy-peasy";
 
-export default function Profile() {
-  const user = useStoreState((state) => state.user);
+// Firebase
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "@firebaseConfig";
+
+export default function Profile({ navigation }) {
+  // State
+  const { user } = useStoreState((s) => s);
+  const { setUser } = useStoreActions((a) => a);
 
   const [isEditing, setEditing] = useState(false);
+  const [email, setEmail] = useState(user.email);
+  const [name, setName] = useState(user.name);
+  const [phoneNum, setPhoneNumber] = useState(user.phoneNum);
+  const [isNgo, setIsNgo] = useState(user.isNgo);
+  const [loading, setLoading] = useState(false);
+
   const height = useHeaderHeight();
 
-  const [email, setEmail] = useState(user.name);
-  const [name, setName] = useState(user.email);
-
+  // Funcs
   const toggleEdit = () => {
-    setEditing(isEditing ^ true);
+    setEditing(!isEditing);
   };
 
+  const updateProfile = async () => {
+    try {
+      setLoading(true);
+      const updatedUser = {
+        email,
+        name,
+        isNgo,
+        phoneNum,
+      };
+
+      const userDoc = doc(db, "users", user.id);
+      await updateDoc(userDoc, updatedUser);
+
+      setUser({ ...updatedUser, id: user.id });
+      toggleEdit();
+
+      navigation.navigate("Calm");
+    } catch (e) {
+      console.warn(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // UI
   return (
     <ScrollView>
       <KeyboardAvoidingView
@@ -39,7 +78,7 @@ export default function Profile() {
           <Button
             icon="camera"
             mode="text"
-            onPress={() => toggleEdit()}
+            onPress={() => {}}
             style={style.profilePicButton}
           >
             Change Profile Picture
@@ -52,32 +91,57 @@ export default function Profile() {
               <Button
                 icon="check-bold"
                 mode="text"
-                onPress={() => toggleEdit()}
+                onPress={updateProfile}
+                loading={loading}
               >
                 Save
               </Button>
             ) : (
-              <Button icon="pencil" mode="text" onPress={() => toggleEdit()}>
+              <Button icon="pencil" mode="text" onPress={toggleEdit}>
                 Edit
               </Button>
             )}
           </View>
           <TextInput
-            style={style.formInput}
             mode={"outlined"}
             label={"Email"}
             onChangeText={(input) => setEmail(input)}
             disabled={!isEditing}
             value={email}
-          ></TextInput>
+          />
           <TextInput
-            style={style.formInput}
             mode={"outlined"}
             label={"Name"}
             onChangeText={(input) => setName(input)}
             disabled={!isEditing}
             value={name}
-          ></TextInput>
+          />
+          <TextInput
+            label={"Phone Number"}
+            mode={"outlined"}
+            keyboardType="numeric"
+            onChangeText={(number) => setPhoneNumber(number)}
+            disabled={!isEditing}
+            value={phoneNum}
+            maxLength={15}
+          />
+
+          <View
+            style={{
+              paddingHorizontal: 1,
+              alignItems: "center",
+              flexDirection: "row",
+            }}
+          >
+            <Text>SAR Mode</Text>
+            <Switch
+              value={isNgo}
+              onValueChange={() => {
+                setIsNgo(!isNgo);
+              }}
+              disabled={!isEditing}
+            />
+          </View>
         </View>
       </KeyboardAvoidingView>
     </ScrollView>

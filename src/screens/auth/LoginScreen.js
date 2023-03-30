@@ -1,3 +1,5 @@
+import React from "react";
+
 import { useState } from "react";
 import { useStoreActions } from "easy-peasy";
 
@@ -5,36 +7,33 @@ import { View, StyleSheet } from "react-native";
 import {
   Button,
   TextInput,
+  HelperText,
   Text,
   Checkbox,
   IconButton,
-  HelperText,
 } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import LottieView from "lottie-react-native";
 
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { collection, doc, setDoc } from "firebase/firestore";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { auth, db } from "@firebaseConfig";
 
-export default function SignUpScreen({ navigation }) {
+export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
   const [pass, setPassword] = useState("");
-  const [phoneNum, setPhoneNumber] = useState("");
+  const [isNgo, setNgo] = useState(false);
+
+  const { setUser } = useStoreActions((a) => a);
 
   const [error, setErrMsg] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const [isNgo, setNgo] = useState(false);
-
-  const setUser = useStoreActions((actions) => actions.setUser);
-
-  const handleSignUp = async () => {
+  const handleLogin = async () => {
     try {
       setLoading(true);
-      const userCredential = await createUserWithEmailAndPassword(
+      const userCredential = await signInWithEmailAndPassword(
         auth,
         email,
         pass
@@ -42,23 +41,22 @@ export default function SignUpScreen({ navigation }) {
 
       const id = userCredential.user.uid;
 
-      const user = {
-        name,
-        email,
-        id,
+      // get user from collection
+      const userDoc = doc(db, "users", id);
+      await updateDoc(userDoc, {
         isNgo,
-        phoneNum,
-      };
+      });
 
-      // Add to users collection
-      await setDoc(doc(collection(db, "users"), id), user);
+      const user = await getDoc(userDoc);
 
-      setUser(user);
+      setUser(user.data());
     } catch (error) {
-      if (error.code === "auth/email-already-in-use") {
-        setErrMsg("Email already in use !");
-      } else if (error.code === "auth/invalid-email") {
-        setErrMsg("Invalid Email !");
+      console.log(error);
+      if (
+        error.code === "auth/wrong-password" ||
+        error.code === "auth/user-not-found"
+      ) {
+        setErrMsg("Check Your Credentials");
       }
     } finally {
       setLoading(false);
@@ -80,6 +78,7 @@ export default function SignUpScreen({ navigation }) {
       <View style={style.formCard}>
         <View>
           <TextInput
+            style={style.formInput}
             mode={"outlined"}
             label={"Email"}
             onChangeText={(input) => setEmail(input)}
@@ -95,27 +94,27 @@ export default function SignUpScreen({ navigation }) {
             {error}
           </HelperText>
         </View>
-        <TextInput
-          mode={"outlined"}
-          label={"Password"}
-          secureTextEntry={true}
-          onChangeText={(input) => setPassword(input)}
-          value={pass}
-        />
-        <TextInput
-          mode={"outlined"}
-          label={"Name"}
-          onChangeText={(input) => setName(input)}
-          value={name}
-        />
-        <TextInput
-          label={"Phone Number"}
-          mode={"outlined"}
-          keyboardType="numeric"
-          onChangeText={(number) => setPhoneNumber(number)}
-          value={phoneNum}
-          maxLength={15}
-        />
+
+        <View>
+          <TextInput
+            style={style.formInput}
+            mode={"outlined"}
+            label={"Password"}
+            secureTextEntry={true}
+            onChangeText={(input) => setPassword(input)}
+            value={pass}
+          />
+          <HelperText
+            type="error"
+            visible={error !== null}
+            style={{
+              display: error !== null ? "flex" : "none",
+            }}
+          >
+            {error}
+          </HelperText>
+        </View>
+
         <View
           style={{
             flexDirection: "row",
@@ -134,7 +133,6 @@ export default function SignUpScreen({ navigation }) {
           />
           <Text>SAR team login</Text>
         </View>
-
         {isNgo && (
           <View
             style={{
@@ -164,21 +162,21 @@ export default function SignUpScreen({ navigation }) {
         )}
         <Button
           style={style.signInButton}
-          onPress={handleSignUp}
+          onPress={handleLogin}
           mode="contained"
           icon="login"
           loading={loading}
         >
-          Sign Up !
+          Login
         </Button>
       </View>
       <Button
-        onPress={() => navigation.navigate("login")}
+        onPress={() => navigation.navigate("signup")}
         style={{
           marginTop: 30,
         }}
       >
-        Already have an account? Login
+        New Here? Sign Up
       </Button>
     </SafeAreaView>
   );

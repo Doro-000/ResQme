@@ -9,7 +9,4 @@ export default authStore = {
   logout: action((state, _) => {
     state.user = {};
   }),
-  getAuthenticated: computed((state) => {
-    return !isEmpty(state.user);
-  }),
 };

@@ -7,7 +7,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getFirestore } from "firebase/firestore";
 
 import { getDatabase, ref } from "firebase/database";
-import { GeoFire } from "geofire";
 
 import {
   FIREBASE_apiKey,
@@ -36,11 +35,7 @@ const app = initializeApp(firebaseConfig);
 const auth = initializeAuth(app, {
   persistence: getReactNativePersistence(AsyncStorage),
 });
-
 const db = getFirestore(app);
+const rdb = getDatabase(app, FIREBASE_databaseURL);
 
-const geoFire = new GeoFire(
-  ref(getDatabase(app, FIREBASE_databaseURL), "locations")
-);
-
-export { app, db, auth, geoFire };
+export { app, db, auth, rdb };
