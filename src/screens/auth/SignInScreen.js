@@ -8,6 +8,7 @@ import {
   Text,
   Checkbox,
   IconButton,
+  HelperText,
 } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -21,6 +22,10 @@ export default function SignUpScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [pass, setPassword] = useState("");
+  const [phoneNum, setPhoneNumber] = useState("");
+
+  const [error, setErrMsg] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const [isNgo, setNgo] = useState(false);
 
@@ -28,6 +33,7 @@ export default function SignUpScreen({ navigation }) {
 
   const handleSignUp = async () => {
     try {
+      setLoading(true);
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
@@ -41,6 +47,7 @@ export default function SignUpScreen({ navigation }) {
         email,
         id,
         isNgo,
+        phoneNum,
       };
 
       // Add to users collection
@@ -48,7 +55,13 @@ export default function SignUpScreen({ navigation }) {
 
       setUser(user);
     } catch (error) {
-      console.log(error);
+      if (error.code === "auth/email-already-in-use") {
+        setErrMsg("Email already in use !");
+      } else if (error.code === "auth/invalid-email") {
+        setErrMsg("Invalid Email !");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -65,28 +78,44 @@ export default function SignUpScreen({ navigation }) {
         source={require("@assets/login.json")}
       />
       <View style={style.formCard}>
+        <View>
+          <TextInput
+            mode={"outlined"}
+            label={"Email"}
+            onChangeText={(input) => setEmail(input)}
+            value={email}
+          />
+          <HelperText
+            type="error"
+            visible={error !== null}
+            style={{
+              display: error !== null ? "flex" : "none",
+            }}
+          >
+            {error}
+          </HelperText>
+        </View>
         <TextInput
-          style={style.formInput}
-          mode={"outlined"}
-          label={"Email"}
-          onChangeText={(input) => setEmail(input)}
-          value={email}
-        ></TextInput>
-        <TextInput
-          style={style.formInput}
           mode={"outlined"}
           label={"Password"}
           secureTextEntry={true}
           onChangeText={(input) => setPassword(input)}
           value={pass}
-        ></TextInput>
+        />
         <TextInput
-          style={style.formInput}
           mode={"outlined"}
           label={"Name"}
           onChangeText={(input) => setName(input)}
           value={name}
-        ></TextInput>
+        />
+        <TextInput
+          label={"Phone Number"}
+          mode={"outlined"}
+          keyboardType="numeric"
+          onChangeText={(number) => setPhoneNumber(number)}
+          value={phoneNum}
+          maxLength={15}
+        />
         <View
           style={{
             flexDirection: "row",
@@ -138,6 +167,7 @@ export default function SignUpScreen({ navigation }) {
           onPress={handleSignUp}
           mode="contained"
           icon="login"
+          loading={loading}
         >
           Sign Up !
         </Button>

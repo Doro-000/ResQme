@@ -68,7 +68,7 @@ const VictimDetail = ({
         setVictim({
           profilePicture: require("@assets/lego.png"),
           name: victimData.title,
-          phone: userInfo.phone,
+          phone: userInfo.phoneNum,
           lastSeen: lastSeen.toRelative(),
           bpm: `${randNumber({ min: 80, max: 150 })} bpm`,
           location: {

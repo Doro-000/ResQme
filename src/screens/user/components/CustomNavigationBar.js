@@ -10,8 +10,6 @@ import {
   Divider,
 } from "react-native-paper";
 
-import { StackActions } from "@react-navigation/native";
-
 import { useStoreActions, useStoreState } from "easy-peasy";
 
 import { StyleSheet } from "react-native";
@@ -25,10 +23,14 @@ const { Header, Content, Action } = Appbar;
 
 export default function CustomNavigationBar({ navigation }) {
   const [visible, setVisible] = useState(false);
+  const [infoVisible, setInfoVisible] = useState(false);
   const { logout } = useStoreActions((a) => a);
 
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
+
+  const showInfoModal = () => setInfoVisible(true);
+  const hideInfoModal = () => setInfoVisible(false);
 
   const { user } = useStoreState((s) => s);
 
@@ -54,11 +56,8 @@ export default function CustomNavigationBar({ navigation }) {
           navigation.navigate("Calm");
         }}
       />
-      <Action
-        icon="account"
-        onPress={() => navigation.navigate("Profile")}
-        color=""
-      />
+      <Action icon="information" onPress={showInfoModal} color="#600D75" />
+      <Action icon="account" onPress={() => navigation.navigate("Profile")} />
       <Action icon="logout" onPress={showModal} color="#a81c06" />
       <Portal>
         <Modal
@@ -75,6 +74,36 @@ export default function CustomNavigationBar({ navigation }) {
             </Button>
             <Button onPress={signOut}>Log out</Button>
           </View>
+        </Modal>
+      </Portal>
+
+      <Portal>
+        <Modal
+          visible={infoVisible}
+          onDismiss={hideInfoModal}
+          contentContainerStyle={styles.modal}
+        >
+          <Text variant="headlineSmall">Info</Text>
+          <Divider />
+          <Text variant="bodySmall">
+            ⚒️ Built for the Google Solution Challenge 2023.
+          </Text>
+          <Text variant="bodySmall">
+            ⚠️ Includes random data for demo purposes !
+          </Text>
+          <Text variant="bodySmall">
+            ℹ️ Switch Context (Victim / Search and Rescue) in the profile tab.
+          </Text>
+          <Divider />
+          <Text
+            variant="bodySmall"
+            style={{
+              marginTop: 10,
+              textAlign: "right",
+            }}
+          >
+            Made with ❤️ in Bremen.
+          </Text>
         </Modal>
       </Portal>
     </Header>

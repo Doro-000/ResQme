@@ -15,7 +15,7 @@ import { useStoreState, useStoreActions } from "easy-peasy";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@firebaseConfig";
 
-export default function Profile() {
+export default function Profile({ navigation }) {
   const { user } = useStoreState((s) => s);
   const { setUser } = useStoreActions((a) => a);
 
@@ -24,24 +24,37 @@ export default function Profile() {
 
   const [email, setEmail] = useState(user.email);
   const [name, setName] = useState(user.name);
+  const [phoneNum, setPhoneNumber] = useState(user.phoneNum);
   const [isNgo, setIsNgo] = useState(user.isNgo);
+
+  const [loading, setLoading] = useState(false);
 
   const toggleEdit = () => {
     setEditing(!isEditing);
   };
 
   const updateProfile = async () => {
-    const updatedUser = {
-      email,
-      name,
-      isNgo,
-    };
+    try {
+      setLoading(true);
+      const updatedUser = {
+        email,
+        name,
+        isNgo,
+        phoneNum,
+      };
 
-    const userDoc = doc(db, "users", user.id);
-    await updateDoc(userDoc, updatedUser);
+      const userDoc = doc(db, "users", user.id);
+      await updateDoc(userDoc, updatedUser);
 
-    setUser({ ...updatedUser, id: user.id });
-    toggleEdit();
+      setUser({ ...updatedUser, id: user.id });
+      toggleEdit();
+
+      navigation.navigate("Calm");
+    } catch (e) {
+      console.warn(e);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -56,20 +69,25 @@ export default function Profile() {
           <View style={style.profilePic}>
             <Avatar.Image size={200} source={require("@assets/lego.png")} />
           </View>
-          {/* <Button
+          <Button
             icon="camera"
             mode="text"
             onPress={() => {}}
             style={style.profilePicButton}
           >
             Change Profile Picture
-          </Button> */}
+          </Button>
         </View>
         <View style={[style.profileSection, style.cards]}>
           <View style={style.profileInfoHeader}>
             <Text>Profile Information</Text>
             {isEditing ? (
-              <Button icon="check-bold" mode="text" onPress={updateProfile}>
+              <Button
+                icon="check-bold"
+                mode="text"
+                onPress={updateProfile}
+                loading={loading}
+              >
                 Save
               </Button>
             ) : (
@@ -79,21 +97,28 @@ export default function Profile() {
             )}
           </View>
           <TextInput
-            style={style.formInput}
             mode={"outlined"}
             label={"Email"}
             onChangeText={(input) => setEmail(input)}
             disabled={!isEditing}
             value={email}
-          ></TextInput>
+          />
           <TextInput
-            style={style.formInput}
             mode={"outlined"}
             label={"Name"}
             onChangeText={(input) => setName(input)}
             disabled={!isEditing}
             value={name}
-          ></TextInput>
+          />
+          <TextInput
+            label={"Phone Number"}
+            mode={"outlined"}
+            keyboardType="numeric"
+            onChangeText={(number) => setPhoneNumber(number)}
+            disabled={!isEditing}
+            value={phoneNum}
+            maxLength={15}
+          />
 
           <View
             style={{

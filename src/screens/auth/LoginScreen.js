@@ -7,6 +7,7 @@ import { View, StyleSheet } from "react-native";
 import {
   Button,
   TextInput,
+  HelperText,
   Text,
   Checkbox,
   IconButton,
@@ -26,8 +27,12 @@ export default function LoginScreen({ navigation }) {
 
   const { setUser } = useStoreActions((a) => a);
 
+  const [error, setErrMsg] = useState(null);
+  const [loading, setLoading] = useState(false);
+
   const handleLogin = async () => {
     try {
+      setLoading(true);
       const userCredential = await signInWithEmailAndPassword(
         auth,
         email,
@@ -47,6 +52,14 @@ export default function LoginScreen({ navigation }) {
       setUser(user.data());
     } catch (error) {
       console.log(error);
+      if (
+        error.code === "auth/wrong-password" ||
+        error.code === "auth/user-not-found"
+      ) {
+        setErrMsg("Check Your Credentials");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -63,22 +76,44 @@ export default function LoginScreen({ navigation }) {
         source={require("@assets/login.json")}
       />
       <View style={style.formCard}>
-        <TextInput
-          style={style.formInput}
-          mode={"outlined"}
-          label={"Email"}
-          onChangeText={(input) => setEmail(input)}
-          value={email}
-        />
+        <View>
+          <TextInput
+            style={style.formInput}
+            mode={"outlined"}
+            label={"Email"}
+            onChangeText={(input) => setEmail(input)}
+            value={email}
+          />
+          <HelperText
+            type="error"
+            visible={error !== null}
+            style={{
+              display: error !== null ? "flex" : "none",
+            }}
+          >
+            {error}
+          </HelperText>
+        </View>
 
-        <TextInput
-          style={style.formInput}
-          mode={"outlined"}
-          label={"Password"}
-          secureTextEntry={true}
-          onChangeText={(input) => setPassword(input)}
-          value={pass}
-        />
+        <View>
+          <TextInput
+            style={style.formInput}
+            mode={"outlined"}
+            label={"Password"}
+            secureTextEntry={true}
+            onChangeText={(input) => setPassword(input)}
+            value={pass}
+          />
+          <HelperText
+            type="error"
+            visible={error !== null}
+            style={{
+              display: error !== null ? "flex" : "none",
+            }}
+          >
+            {error}
+          </HelperText>
+        </View>
 
         <View
           style={{
@@ -130,6 +165,7 @@ export default function LoginScreen({ navigation }) {
           onPress={handleLogin}
           mode="contained"
           icon="login"
+          loading={loading}
         >
           Login
         </Button>
