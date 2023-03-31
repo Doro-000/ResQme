@@ -8,7 +8,7 @@ ResQme was born due to the devastating earthquakes in Turkey and Syria of Februa
 ### Features
 We built ResQme to serve as a bridge between the victims and Search and Rescue Teams, as well as anyone around who is up to help. Users stuck under rubble can easily share their location and vital information to Rescue teams. In addition to this, Victims can make their phone ring with a high pitched sound so that Rescue teams can easily detect where they are. This also has the added benefit of keeping the Victim from shouting as that could cause them to inhale dangerous amounts of dust and toxic material. 
 
-This aggregated data inturn provides Search and Rescue Teams With heat/density maps of sruviving victims and help them organize and get help where it's urgently needed. 
+This aggregated data inturn provides Search and Rescue Teams With heat/density maps of sruviving victims and help them organize and deliver help where it's urgently needed. 
 
 During the above mentioned earthquake were unavailable due to high amount of callers. Our Application is Built on top of Firebase, to guarantee high availabilty as user traffic increases.
 
@@ -58,4 +58,4 @@ OR
 - [@UncrownedKing1](https://github.com/UncrownedKing1)
 
 
-Made with ❤️
+Made with ❤️ in Bremen
