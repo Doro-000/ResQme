@@ -48,7 +48,7 @@ OR
 
 # Demo
 
-[Google Solution Challenge 2023 submission video](https://youtu.be/IdH_sVD0rhg)
+[Google Solution Challenge 2023 submission video](https://youtu.be/VkfULcUcQxQ)
 
 
 
@@ -59,3 +59,4 @@ OR
 
 
 Made with ❤️ in Bremen
+Google Developer Student Clubs Constructor University (previously Jacobs University)
