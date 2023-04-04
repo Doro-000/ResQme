@@ -59,4 +59,5 @@ OR
 
 
 Made with ❤️ in Bremen
+<br />
 Google Developer Student Clubs Constructor University (previously Jacobs University)
