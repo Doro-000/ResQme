@@ -58,6 +58,5 @@ OR
 - [@UncrownedKing1](https://github.com/UncrownedKing1)
 
 
-Made with ❤️ in Bremen
-<br />
+Made with ❤️ in Bremen<br />
 Google Developer Student Clubs Constructor University (previously Jacobs University)
