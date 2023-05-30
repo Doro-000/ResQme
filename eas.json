@@ -19,6 +19,12 @@
         "buildType": "apk"
       }
     },
+    "internalTestGoogle": {
+      "distribution": "store",
+      "android": {
+        "buildType": "app-bundle"
+      }
+    },
     "production": {
       "ios": {
         "resourceClass": "m-medium"
