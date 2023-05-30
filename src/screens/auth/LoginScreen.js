@@ -25,7 +25,7 @@ export default function LoginScreen({ navigation }) {
   const [pass, setPassword] = useState("");
   const [isNgo, setNgo] = useState(false);
 
-  const { setUser } = useStoreActions((a) => a);
+  const { setUser, setMedicalInfo } = useStoreActions((a) => a);
 
   const [error, setErrMsg] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -47,9 +47,14 @@ export default function LoginScreen({ navigation }) {
         isNgo,
       });
 
+      // get user medical information.
+      const medicalDoc = doc(db, "medInfo", id);
+
       const user = await getDoc(userDoc);
+      const medicalInfo = await getDoc(medicalDoc);
 
       setUser(user.data());
+      setMedicalInfo(medicalInfo.data() ?? {});
     } catch (error) {
       console.warn(error);
       if (
