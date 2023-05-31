@@ -10,9 +10,10 @@ import { SegmentedButtons } from "react-native-paper";
 
 import Map from "../components/Map";
 import VictimDetail from "../components/VictimDetail";
+import MapMarker from "../components/MapMarker";
 
 // Map
-import { Marker, Heatmap } from "react-native-maps";
+import { Heatmap } from "react-native-maps";
 
 // State
 import { useStoreState } from "easy-peasy";
@@ -118,6 +119,25 @@ export default function Calm({ navigation }) {
     []
   );
 
+  const onPress = (e) => {
+    const id = e.nativeEvent.id;
+    const randomVictim = randomVictims.filter((item) => item.id === id);
+    let victimData = {};
+    if (!isEmpty(randomVictim)) {
+      victimData = randomVictim[0];
+      setSampleVictim(true);
+    } else {
+      const realVicitm = victims.filter((item) => item.id === id);
+      victimData = realVicitm[0];
+      setSampleVictim(false);
+    }
+    setCurrentVictimData(victimData);
+  };
+
+  const onCalloutPress = (_) => {
+    toggleBottomSheet();
+  };
+
   // map Animations
   const pinAnimation = () => {
     mapRef.current.animateCamera({
@@ -143,6 +163,20 @@ export default function Calm({ navigation }) {
     });
   };
 
+  const renderMarkers = () => {
+    return victims.map((marker, index) => (
+      <MapMarker
+        key={index}
+        index={index}
+        marker={marker}
+        onPress={onPress}
+        onCalloutPress={onCalloutPress}
+        cluster
+        coordinate={marker.latlng}
+      />
+    ));
+  };
+
   // UI
   useEffect(() => {
     if (isFocused) {
@@ -163,46 +197,9 @@ export default function Calm({ navigation }) {
           refreshData={updateVictims}
         >
           {user.isNgo && mapMode === "heatMap" ? (
-            <>
-              <Heatmap points={getVictimPoints()} radius={35} />
-            </>
+            <Heatmap points={getVictimPoints()} radius={35} />
           ) : (
-            <>
-              {victims.map((marker, index) => {
-                if (marker.latlng) {
-                  return (
-                    <Marker
-                      key={index}
-                      coordinate={marker.latlng}
-                      title={marker.title}
-                      description={"Click to see more details !"}
-                      identifier={marker.id}
-                      onPress={(e) => {
-                        const id = e.nativeEvent.id;
-                        const randomVictim = randomVictims.filter(
-                          (item) => item.id === id
-                        );
-                        let victimData = {};
-                        if (!isEmpty(randomVictim)) {
-                          victimData = randomVictim[0];
-                          setSampleVictim(true);
-                        } else {
-                          const realVicitm = victims.filter(
-                            (item) => item.id === id
-                          );
-                          victimData = realVicitm[0];
-                          setSampleVictim(false);
-                        }
-                        setCurrentVictimData(victimData);
-                      }}
-                      onCalloutPress={(_) => {
-                        toggleBottomSheet();
-                      }}
-                    />
-                  );
-                }
-              })}
-            </>
+            renderMarkers()
           )}
         </Map>
       </View>

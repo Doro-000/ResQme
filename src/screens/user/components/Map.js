@@ -2,7 +2,8 @@
 import { useState } from "react";
 
 // UI
-import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
+import { PROVIDER_GOOGLE } from "react-native-maps";
+import MapView from "react-native-map-clustering";
 import { StyleSheet, View } from "react-native";
 import {
   IconButton,
@@ -12,6 +13,7 @@ import {
   Button,
   Text,
 } from "react-native-paper";
+import { useStoreState } from "easy-peasy";
 
 export default function Map({
   children,
@@ -25,11 +27,19 @@ export default function Map({
   const hideModal = () => setVisible(false);
 
   const [mapType, setMapType] = useState("standard");
+  const { location } = useStoreState((s) => s);
 
   // Ui
   return (
     <View>
       <MapView
+        clusterColor="#673ab7"
+        initialRegion={{
+          latitude: location.latitude,
+          longitude: location.longitude,
+          latitudeDelta: 8.5,
+          longitudeDelta: 8.5,
+        }}
         provider={PROVIDER_GOOGLE}
         style={styles.map}
         showsUserLocation={true}
