@@ -25,13 +25,18 @@ export default function RootNavigator() {
   const [uid, setUid] = useState(null);
   const [setErrorMsg] = useState(null);
 
-  const { setPermissions, setLocation, setUser } = useStoreActions((a) => a);
+  const { setPermissions, setLocation, setUser, setMedicalInfo } =
+    useStoreActions((a) => a);
 
   // funcs
   const getUserInfo = async (uid) => {
     const userDoc = doc(db, "users", uid);
     const userInfo = await getDoc(userDoc);
     setUser(userInfo.data());
+
+    const medicalDoc = doc(db, "userMedicalInfo", uid);
+    const medicalInfo = (await getDoc(medicalDoc)).data();
+    setMedicalInfo(medicalInfo ?? {});
   };
 
   const getLocation = async () => {

@@ -52,7 +52,6 @@ export default function SignUpScreen({ navigation }) {
 
       // Add to users collection
       await setDoc(doc(collection(db, "users"), id), user);
-
       setUser(user);
     } catch (error) {
       if (error.code === "auth/email-already-in-use") {
@@ -67,7 +66,7 @@ export default function SignUpScreen({ navigation }) {
 
   return (
     <SafeAreaView style={style.signInView}>
-      <Text variant="displayLarge">⛑ ResQme</Text>
+      <Text variant="displayLarge">⛑️ ResQme</Text>
       <LottieView
         autoPlay
         style={{

@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { useHeaderHeight } from "@react-navigation/elements";
 
-// state
+// STATE
 import { useStoreState, useStoreActions } from "easy-peasy";
 
 // Firebase
@@ -20,10 +20,10 @@ import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@firebaseConfig";
 
 export default function Profile({ navigation }) {
-  // State
   const { user } = useStoreState((s) => s);
   const { setUser } = useStoreActions((a) => a);
 
+  // FORM STATE
   const [isEditing, setEditing] = useState(false);
   const [email, setEmail] = useState(user.email);
   const [name, setName] = useState(user.name);
@@ -33,7 +33,7 @@ export default function Profile({ navigation }) {
 
   const height = useHeaderHeight();
 
-  // Funcs
+  // FUNCS
   const toggleEdit = () => {
     setEditing(!isEditing);
   };
@@ -88,14 +88,19 @@ export default function Profile({ navigation }) {
           <View style={style.profileInfoHeader}>
             <Text>Profile Information</Text>
             {isEditing ? (
-              <Button
-                icon="check-bold"
-                mode="text"
-                onPress={updateProfile}
-                loading={loading}
-              >
-                Save
-              </Button>
+              <>
+                <Button
+                  icon="check-bold"
+                  mode="text"
+                  onPress={updateProfile}
+                  loading={loading}
+                >
+                  Save
+                </Button>
+                <Button icon="cancel" mode="text" onPress={toggleEdit}>
+                  cancel
+                </Button>
+              </>
             ) : (
               <Button icon="pencil" mode="text" onPress={toggleEdit}>
                 Edit
@@ -141,6 +146,20 @@ export default function Profile({ navigation }) {
               }}
               disabled={!isEditing}
             />
+          </View>
+        </View>
+        <View style={[style.profileSection, style.cards]}>
+          <View style={style.profileInfoHeader}>
+            <Text>Medical Information</Text>
+            <Button
+              icon="pencil"
+              mode="text"
+              onPress={() => {
+                navigation.navigate("MedicalInfo", { editMode: false });
+              }}
+            >
+              Edit
+            </Button>
           </View>
         </View>
       </KeyboardAvoidingView>

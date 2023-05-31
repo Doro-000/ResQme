@@ -14,25 +14,13 @@ import CustomNavigationBar from "./components/CustomNavigationBar";
 
 const { Navigator, Screen } = createNativeStackNavigator();
 
-// UTIL
-import { isEmpty } from "lodash";
-
 export default function UserStack({ hideSplash }) {
-  const { user, medicalInfo } = useStoreState((s) => s);
-  let initialRouteName = "Calm";
-
-  if (user.panicMode) {
-    initialRouteName = "Panic";
-  } else {
-    if (isEmpty(medicalInfo)) {
-      initialRouteName = "MedicalInfo";
-    }
-  }
+  const { user } = useStoreState((s) => s);
 
   return (
     <NavigationContainer onReady={hideSplash}>
       <Navigator
-        initialRouteName={initialRouteName}
+        initialRouteName={user.panicMode ? "Panic" : "Calm"}
         screenOptions={{
           header: (props) => <CustomNavigationBar {...props} />,
         }}

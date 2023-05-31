@@ -1,0 +1,82 @@
+diff --git a/node_modules/react-native-dropdown-select-list/components/MultipleSelectList.tsx b/node_modules/react-native-dropdown-select-list/components/MultipleSelectList.tsx
+index a42ea7d..8c052f5 100644
+--- a/node_modules/react-native-dropdown-select-list/components/MultipleSelectList.tsx
++++ b/node_modules/react-native-dropdown-select-list/components/MultipleSelectList.tsx
+@@ -8,7 +8,6 @@ import {
+     ScrollView,
+     Animated,
+     TextInput,
+-    ViewStyle,
+     Pressable} from 'react-native';
+ 
+ import { MultipleSelectListProps } from '..';
+@@ -42,7 +41,8 @@ const MultipleSelectList: React.FC<MultipleSelectListProps> = ({
+         badgeTextStyles,
+         checkBoxStyles,
+         save = 'key',
+-        dropdownShown = false
++        dropdownShown = false,
++        enabled = true
+     }) => {
+ 
+     const oldOption = React.useRef(null)
+@@ -167,7 +167,7 @@ const MultipleSelectList: React.FC<MultipleSelectListProps> = ({
+                 (selectedval?.length > 0 )
+ 
+                 ?
+-                    <TouchableOpacity style={[styles.wrapper,boxStyles]} onPress={() => { if(!dropdown){ slidedown() }else{ slideup() } }} >
++                    <TouchableOpacity disabled={!enabled} style={[styles.wrapper,boxStyles]} onPress={() => { if(!dropdown){ slidedown() }else{ slideup() } }} >
+                         <View>
+                             <Text style={[{fontWeight:'600',fontFamily},labelStyles]}>{ label }</Text>
+                             <View style={{flexDirection:'row',marginBottom:8,flexWrap:'wrap'}}>
+diff --git a/node_modules/react-native-dropdown-select-list/components/SelectList.tsx b/node_modules/react-native-dropdown-select-list/components/SelectList.tsx
+index 00e86e5..a77c76a 100644
+--- a/node_modules/react-native-dropdown-select-list/components/SelectList.tsx
++++ b/node_modules/react-native-dropdown-select-list/components/SelectList.tsx
+@@ -36,7 +36,8 @@ const SelectList: React.FC<SelectListProps> =  ({
+         onSelect = () => {},
+         save = 'key',
+         dropdownShown = false,
+-        fontFamily
++        fontFamily,
++        enabled = true
+     }) => {
+ 
+     const oldOption = React.useRef(null)
+@@ -168,7 +169,7 @@ const SelectList: React.FC<SelectListProps> =  ({
+                         
+                     </View>
+                 :
+-                    <TouchableOpacity style={[styles.wrapper,boxStyles]} onPress={() => { if(!dropdown){ slidedown() }else{ slideup() } }}>
++                    <TouchableOpacity disabled={!enabled} style={[styles.wrapper,boxStyles]} onPress={() => { if(!dropdown){ slidedown() }else{ slideup() } }}>
+                         <Text style={[{fontFamily},inputStyles]}>{ (selectedval == "") ? (placeholder) ? placeholder : 'Select option' : selectedval  }</Text>
+                         {
+                             (!arrowicon)
+diff --git a/node_modules/react-native-dropdown-select-list/index.d.ts b/node_modules/react-native-dropdown-select-list/index.d.ts
+index d1f4df3..a5c3ede 100644
+--- a/node_modules/react-native-dropdown-select-list/index.d.ts
++++ b/node_modules/react-native-dropdown-select-list/index.d.ts
+@@ -112,6 +112,11 @@ export interface SelectListProps  {
+     *  Pass any JSX to this prop like Text, Image or Icon to show instead of close icon
+     */
+     closeicon?: JSX.Element,
++
++    /**
++     * Enable interaction with dropdown
++     */
++    enabled?: Boolean
+ }
+ 
+ 
+@@ -257,6 +262,11 @@ export interface MultipleSelectListProps  {
+     * Additional styles for label
+     */
+     labelStyles?: TextStyle,
++
++    /**
++     * Enable interaction with dropdown
++     */
++    enabled?: Boolean
+ }
+ 
+ declare class MultipleSelectList extends React.Component<MultipleSelectListProps> {}
