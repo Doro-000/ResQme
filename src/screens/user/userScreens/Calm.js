@@ -6,7 +6,7 @@ import { View, StyleSheet } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { SwipeButton } from "react-native-expo-swipe-button";
 import { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
-import { SegmentedButtons } from "react-native-paper";
+import { SegmentedButtons, Banner, Text } from "react-native-paper";
 
 import Map from "../components/Map";
 import VictimDetail from "../components/VictimDetail";
@@ -16,7 +16,7 @@ import MapMarker from "../components/MapMarker";
 import { Heatmap } from "react-native-maps";
 
 // State
-import { useStoreState } from "easy-peasy";
+import { useStoreState, useStoreActions } from "easy-peasy";
 
 // Firebase
 import { rdb } from "@firebaseConfig";
@@ -28,6 +28,7 @@ import { isEmpty, values } from "lodash";
 import { randPhoneNumber, randNumber, randBetweenDate } from "@ngneat/falso";
 import { DateTime } from "luxon";
 import { useIsFocused } from "@react-navigation/native";
+import { sendLocation } from "@utils";
 
 export default function Calm({ navigation }) {
   // State
@@ -38,6 +39,7 @@ export default function Calm({ navigation }) {
   const [bottomSheetActive, setBottomSheetActive] = useState(false);
 
   const { user, location } = useStoreState((s) => s);
+  const { setLocation } = useStoreActions((a) => a);
 
   const [mapMode, setMapMode] = useState("pin");
   const mapRef = useRef(null);
@@ -63,17 +65,19 @@ export default function Calm({ navigation }) {
     const res = [...randomVictims];
     if (!isEmpty(locations)) {
       values(locations.val()).forEach((val) => {
-        const idx = res.findIndex((e) => e.id === val.id);
-        const temp = {
-          title: val.name,
-          id: val.id,
-          latlng: val.latlng,
-          lastSeen: val.lastSeen,
-        };
-        if (idx > -1) {
-          res[idx] = temp;
-        } else {
-          res.push(temp);
+        if (val.latlng) {
+          const idx = res.findIndex((e) => e.id === val.id);
+          const temp = {
+            title: val.name,
+            id: val.id,
+            latlng: val.latlng,
+            lastSeen: val.lastSeen,
+          };
+          if (idx > -1) {
+            res[idx] = temp;
+          } else {
+            res.push(temp);
+          }
         }
       });
     }
@@ -182,6 +186,10 @@ export default function Calm({ navigation }) {
     if (isFocused) {
       updateVictims();
     }
+    if (user.mode === "Independent") {
+      const volunteerRef = ref(rdb, `volunteers/${user.id}`);
+      sendLocation(volunteerRef, 900000, setLocation, user, location);
+    }
   }, [isFocused]);
 
   return (
@@ -190,13 +198,23 @@ export default function Calm({ navigation }) {
         flex: 1,
       }}
     >
+      <Banner visible={user.mode === "Independent"} icon={"information"}>
+        <Text
+          variant="titleMedium"
+          style={{
+            lineHeight: 40,
+          }}
+        >
+          Sharing your contact and location with professional teams...
+        </Text>
+      </Banner>
       <View style={style.mapStyle}>
         <Map
           mapRef={mapRef}
           layoutAnimation={mapMode === "pin" ? pinAnimation : heatAnimation}
           refreshData={updateVictims}
         >
-          {user.isNgo && mapMode === "heatMap" ? (
+          {user.mode === "ProSAR" && mapMode === "heatMap" ? (
             <Heatmap points={getVictimPoints()} radius={35} />
           ) : (
             renderMarkers()
@@ -204,11 +222,11 @@ export default function Calm({ navigation }) {
         </Map>
       </View>
 
-      {user.isNgo === undefined ? (
+      {user.mode === undefined ? (
         <></>
       ) : (
         <>
-          {user.isNgo ? (
+          {user.mode === "ProSAR" ? (
             <SegmentedButtons
               value={mapMode}
               onValueChange={changeMapType}

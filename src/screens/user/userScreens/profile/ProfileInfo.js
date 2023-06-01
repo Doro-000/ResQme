@@ -1,8 +1,10 @@
+import React from "react";
+
 // React
 import { useState } from "react";
 
 // UI
-import { Button, Avatar, TextInput, Text } from "react-native-paper";
+import { Button, TextInput, Text, IconButton } from "react-native-paper";
 import {
   View,
   StyleSheet,
@@ -19,7 +21,7 @@ import { useStoreState, useStoreActions } from "easy-peasy";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@firebaseConfig";
 
-export default function Profile({ navigation }) {
+export default function ProfileInfo({ navigation }) {
   const { user } = useStoreState((s) => s);
   const { setUser } = useStoreActions((a) => a);
 
@@ -28,7 +30,6 @@ export default function Profile({ navigation }) {
   const [email, setEmail] = useState(user.email);
   const [name, setName] = useState(user.name);
   const [phoneNum, setPhoneNumber] = useState(user.phoneNum);
-  const [isNgo, setIsNgo] = useState(user.isNgo);
   const [loading, setLoading] = useState(false);
 
   const height = useHeaderHeight();
@@ -44,7 +45,6 @@ export default function Profile({ navigation }) {
       const updatedUser = {
         email,
         name,
-        isNgo,
         phoneNum,
       };
 
@@ -64,49 +64,24 @@ export default function Profile({ navigation }) {
 
   // UI
   return (
-    <ScrollView>
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <KeyboardAvoidingView
         style={style.layout}
         keyboardVerticalOffset={height}
         behavior="padding"
         enabled
       >
-        <View style={[style.profileSection, style.cards]}>
-          <View style={style.profilePic}>
-            <Avatar.Image size={200} source={require("@assets/lego.png")} />
-          </View>
-          <Button
-            icon="camera"
-            mode="text"
-            onPress={() => {}}
-            style={style.profilePicButton}
-          >
-            Change Profile Picture
-          </Button>
+        {/* Title */}
+        <View style={style.titleCard}>
+          <IconButton
+            icon="keyboard-backspace"
+            mode="contained-tonal"
+            onPress={() => navigation.goBack()}
+          />
+          <Text variant="titleLarge">Profile Information</Text>
         </View>
+
         <View style={[style.profileSection, style.cards]}>
-          <View style={style.profileInfoHeader}>
-            <Text>Profile Information</Text>
-            {isEditing ? (
-              <>
-                <Button
-                  icon="check-bold"
-                  mode="text"
-                  onPress={updateProfile}
-                  loading={loading}
-                >
-                  Save
-                </Button>
-                <Button icon="cancel" mode="text" onPress={toggleEdit}>
-                  cancel
-                </Button>
-              </>
-            ) : (
-              <Button icon="pencil" mode="text" onPress={toggleEdit}>
-                Edit
-              </Button>
-            )}
-          </View>
           <TextInput
             mode={"outlined"}
             label={"Email"}
@@ -130,38 +105,40 @@ export default function Profile({ navigation }) {
             value={phoneNum}
             maxLength={15}
           />
+        </View>
 
+        {isEditing ? (
           <View
             style={{
-              paddingHorizontal: 1,
-              alignItems: "center",
               flexDirection: "row",
+              gap: 10,
+              alignSelf: "flex-end",
             }}
           >
-            <Text>SAR Mode</Text>
-            <Switch
-              value={isNgo}
-              onValueChange={() => {
-                setIsNgo(!isNgo);
-              }}
-              disabled={!isEditing}
-            />
-          </View>
-        </View>
-        <View style={[style.profileSection, style.cards]}>
-          <View style={style.profileInfoHeader}>
-            <Text>Medical Information</Text>
             <Button
-              icon="pencil"
-              mode="text"
-              onPress={() => {
-                navigation.navigate("MedicalInfo", { editMode: false });
-              }}
+              icon="check-bold"
+              mode="contained"
+              onPress={updateProfile}
+              loading={loading}
             >
-              Edit
+              Save
+            </Button>
+            <Button icon="cancel" mode="text" onPress={toggleEdit}>
+              cancel
             </Button>
           </View>
-        </View>
+        ) : (
+          <Button
+            icon="pencil"
+            mode="contained"
+            onPress={toggleEdit}
+            style={{
+              alignSelf: "flex-end",
+            }}
+          >
+            Edit
+          </Button>
+        )}
       </KeyboardAvoidingView>
     </ScrollView>
   );
@@ -206,5 +183,23 @@ const style = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+  },
+  titleCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    alignSelf: "center",
+    borderBottomEndRadius: 8,
+    borderBottomLeftRadius: 8,
+    width: "100%",
+    padding: "4%",
+    backgroundColor: "white",
+    shadowColor: "black",
+    shadowOffset: { width: -2, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 15,
+    marginBottom: 5,
+    marginTop: -10,
   },
 });

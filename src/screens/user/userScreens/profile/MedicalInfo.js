@@ -134,33 +134,35 @@ export default function MedicalInfo({ route, navigation }) {
         enabled
       >
         {/* Title */}
-        <View style={style.profileInfoHeader}>
+        <View style={style.titleCard}>
+          <IconButton
+            icon="keyboard-backspace"
+            mode="contained-tonal"
+            onPress={() => navigation.goBack()}
+          />
           <Text variant="titleLarge">Medical Information</Text>
-          {isEditing ? (
-            <View
+        </View>
+
+        {/* Warning */}
+        {isEmpty(medicalInfo) && (
+          <View style={style.warningCard}>
+            <IconButton
+              icon="information"
+              size={15}
+              mode="outlined"
+              iconColor="black"
+            />
+            <Text
+              variant="bodySmall"
               style={{
-                flexDirection: "row",
-                gap: -15,
+                flexShrink: 1,
               }}
             >
-              <Button
-                icon="check-bold"
-                mode="text"
-                onPress={updateMedicalInfo}
-                loading={loading}
-              >
-                Save
-              </Button>
-              <Button icon="cancel" mode="text" onPress={toggleEdit}>
-                cancel
-              </Button>
-            </View>
-          ) : (
-            <Button icon="pencil" mode="text" onPress={toggleEdit}>
-              Edit
-            </Button>
-          )}
-        </View>
+              To assist rescuers in providing the most effective help, kindly
+              provide your medical information.
+            </Text>
+          </View>
+        )}
 
         <View style={[style.cards, style.profileSection]}>
           {/* Blood Types */}
@@ -311,34 +313,37 @@ export default function MedicalInfo({ route, navigation }) {
           </View>
         </View>
 
-        {/* Title */}
-        {isEmpty(medicalInfo) && (
+        {isEditing ? (
           <View
             style={{
               flexDirection: "row",
-              alignItems: "center",
-              backgroundColor: "#e6b800",
-              paddingHorizontal: 5,
-              paddingVertical: 10,
-              borderRadius: 10,
+              gap: 10,
+              alignSelf: "flex-end",
             }}
           >
-            <IconButton
-              icon="information"
-              size={15}
-              mode="outlined"
-              iconColor="black"
-            />
-            <Text
-              variant="bodySmall"
-              style={{
-                flexShrink: 1,
-              }}
+            <Button
+              icon="check-bold"
+              mode="contained"
+              onPress={updateMedicalInfo}
+              loading={loading}
             >
-              To assist rescuers in providing the most effective help, kindly
-              provide your medical information.
-            </Text>
+              Save
+            </Button>
+            <Button icon="cancel" mode="text" onPress={toggleEdit}>
+              cancel
+            </Button>
           </View>
+        ) : (
+          <Button
+            icon="pencil"
+            mode="contained"
+            onPress={toggleEdit}
+            style={{
+              alignSelf: "flex-end",
+            }}
+          >
+            Edit
+          </Button>
         )}
       </KeyboardAvoidingView>
     </ScrollView>
@@ -360,6 +365,24 @@ const style = StyleSheet.create({
     elevation: 10,
     marginBottom: 12,
   },
+  titleCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    alignSelf: "center",
+    borderBottomEndRadius: 8,
+    borderBottomLeftRadius: 8,
+    width: "100%",
+    padding: "4%",
+    backgroundColor: "white",
+    shadowColor: "black",
+    shadowOffset: { width: -2, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 15,
+    marginBottom: 5,
+    marginTop: -10,
+  },
   profileSection: {
     alignSelf: "center",
     borderRadius: 8,
@@ -375,5 +398,14 @@ const style = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+  },
+  warningCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 5,
+    backgroundColor: "#e6b800",
+    paddingHorizontal: 5,
+    paddingVertical: 10,
+    borderRadius: 10,
   },
 });

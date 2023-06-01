@@ -15,13 +15,13 @@ import Carousel from "react-native-snap-carousel";
 import { useStoreActions, useStoreState } from "easy-peasy";
 
 // Firebase
-import { ref, set, update, remove } from "firebase/database";
+import { ref } from "firebase/database";
 import { doc, updateDoc } from "firebase/firestore";
 import { rdb, db } from "@firebaseConfig";
 
 // Utils
-import { pick } from "lodash";
-import { DateTime } from "luxon";
+
+import { exitLocationShare, sendLocation } from "@utils";
 
 export default function Panic({ navigation }) {
   // State
@@ -61,46 +61,15 @@ export default function Panic({ navigation }) {
     }
   }
 
-  async function sendLocation() {
-    // set initial location
-    await set(rdbRef, {
-      ...pick(user, ["id", "name"]),
-      latlng: { latitude: location.latitude, longitude: location.longitude },
-      lastSeen: DateTime.now().toISO(),
-    });
-
-    await Location.watchPositionAsync(
-      {
-        accuracy: Location.Accuracy.Balanced, // foreground location update
-        timeInterval: 30000, // every 3 minutes
-      },
-      async (location) => {
-        setLocation(location.coords);
-
-        // update every 3 minutes
-        await update(rdbRef, {
-          latlng: {
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-          },
-        });
-      }
-    );
-  }
-
   async function setPanicMode() {
-    await updateDoc(userDoc, { panicMode: true });
-    setUser({ ...user, panicMode: true });
+    await updateDoc(userDoc, { mode: "Panic" });
+    setUser({ ...user, mode: "Panic" });
   }
 
   async function exitPanic() {
-    await remove(rdbRef); // stop tracking on panic exit
+    await exitLocationShare(rdbRef, (mode = "Idle"), user);
 
-    const userDoc = doc(db, "users", user.id); // turn off panic mode
-    await updateDoc(userDoc, { panicMode: false });
-
-    setUser({ ...user, panicMode: false });
-
+    setUser({ ...user, mode: "Idle" });
     navigation.navigate("Calm");
   }
 
@@ -135,7 +104,7 @@ export default function Panic({ navigation }) {
 
   // UI
   useEffect(() => {
-    sendLocation();
+    sendLocation(rdbRef, 900000, setLocation, user, location);
     setPanicMode();
   }, []);
 

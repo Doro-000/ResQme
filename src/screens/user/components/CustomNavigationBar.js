@@ -18,9 +18,10 @@ import { useStoreActions, useStoreState } from "easy-peasy";
 
 // Firebase
 import { signOut as fireBaseSignOut } from "firebase/auth";
-import { doc, updateDoc } from "firebase/firestore";
-import { auth, rdb, db } from "@firebaseConfig";
-import { ref, remove } from "firebase/database";
+import { auth, rdb } from "@firebaseConfig";
+import { ref } from "firebase/database";
+
+import { exitLocationShare } from "@utils";
 
 const { Header, Content, Action } = Appbar;
 export default function CustomNavigationBar({ navigation }) {
@@ -40,10 +41,15 @@ export default function CustomNavigationBar({ navigation }) {
   // funcs
   const signOut = async () => {
     try {
-      await remove(ref(rdb, `victims/${user.id}`)); // stop tracking on panic exit
-
-      const userDoc = doc(db, "users", user.id); // turn off panic mode
-      await updateDoc(userDoc, { panicMode: false });
+      if (user.mode === "Panic") {
+        await exitLocationShare(ref(rdb, `victims/${user.id}`), "Idle", user);
+      } else if (user.mode == "Independent") {
+        await exitLocationShare(
+          ref(rdb, `volunteers/${user.id}`),
+          "Idle",
+          user
+        );
+      }
 
       await fireBaseSignOut(auth);
       logout();
@@ -62,7 +68,10 @@ export default function CustomNavigationBar({ navigation }) {
         }}
       />
       <Action icon="information" onPress={showInfoModal} color="#600D75" />
-      <Action icon="account" onPress={() => navigation.navigate("Profile")} />
+      <Action
+        icon="account"
+        onPress={() => navigation.navigate("Profile", { screen: "Default" })}
+      />
       <Action icon="logout" onPress={showModal} color="#a81c06" />
       <Portal>
         <Modal

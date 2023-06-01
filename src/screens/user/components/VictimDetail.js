@@ -197,7 +197,7 @@ const VictimDetail = ({
                         Linking.openURL(`tel:${victim.phone}`);
                       }}
                     />
-                    {user.isNgo && (
+                    {user.mode === "ProSAR" && (
                       <IconButton
                         icon={"directions"}
                         mode="contained"
@@ -213,7 +213,7 @@ const VictimDetail = ({
                     )}
                   </View>
                 </View>
-                {user.isNgo ? (
+                {user.mode === "ProSAR" ? (
                   <>
                     <View style={[styles.sectionCard, styles.ngoInfoCard]}>
                       <View style={styles.victimInfoItem}>

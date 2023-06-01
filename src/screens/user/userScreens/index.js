@@ -1,6 +1,5 @@
 import Panic from "./Panic";
 import Calm from "./Calm";
-import Profile from "./Profile";
-import MedicalInfo from "./MedicalInfo";
+import ProfileStack from "./profile";
 
-export { Panic, Calm, Profile, MedicalInfo };
+export { Panic, Calm, ProfileStack };

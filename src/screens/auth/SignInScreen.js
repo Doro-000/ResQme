@@ -27,8 +27,6 @@ export default function SignUpScreen({ navigation }) {
   const [error, setErrMsg] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const [isNgo, setNgo] = useState(false);
-
   const setUser = useStoreActions((actions) => actions.setUser);
 
   const handleSignUp = async () => {
@@ -46,8 +44,8 @@ export default function SignUpScreen({ navigation }) {
         name,
         email,
         id,
-        isNgo,
         phoneNum,
+        mode: "Idle",
       };
 
       // Add to users collection
@@ -115,52 +113,6 @@ export default function SignUpScreen({ navigation }) {
           value={phoneNum}
           maxLength={15}
         />
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-          }}
-        >
-          <Checkbox.Item
-            status={isNgo ? "checked" : "unchecked"}
-            onPress={() => {
-              setNgo(!isNgo);
-            }}
-            style={{
-              paddingHorizontal: 0,
-              paddingVertical: 0,
-            }}
-          />
-          <Text>SAR team login</Text>
-        </View>
-
-        {isNgo && (
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              backgroundColor: "#e6b800",
-              paddingHorizontal: 5,
-              paddingVertical: 10,
-              borderRadius: 10,
-            }}
-          >
-            <IconButton
-              icon="information"
-              size={15}
-              mode="outlined"
-              iconColor="black"
-            />
-            <Text
-              variant="bodySmall"
-              style={{
-                flexShrink: 1,
-              }}
-            >
-              This option presents the App from a SAR team member's perspective.
-            </Text>
-          </View>
-        )}
         <Button
           style={style.signInButton}
           onPress={handleSignUp}

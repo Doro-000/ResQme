@@ -9,7 +9,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { NavigationContainer } from "@react-navigation/native";
 
 // UI
-import { Panic, Calm, Profile, MedicalInfo } from "./userScreens";
+import { Panic, Calm, ProfileStack } from "./userScreens";
 import CustomNavigationBar from "./components/CustomNavigationBar";
 
 const { Navigator, Screen } = createNativeStackNavigator();
@@ -20,7 +20,7 @@ export default function UserStack({ hideSplash }) {
   return (
     <NavigationContainer onReady={hideSplash}>
       <Navigator
-        initialRouteName={user.panicMode ? "Panic" : "Calm"}
+        initialRouteName={user.mode === "Panic" ? "Panic" : "Calm"}
         screenOptions={{
           header: (props) => <CustomNavigationBar {...props} />,
         }}
@@ -31,8 +31,7 @@ export default function UserStack({ hideSplash }) {
           component={Panic}
           options={{ headerShown: false }}
         />
-        <Screen name="Profile" component={Profile} />
-        <Screen name="MedicalInfo" component={MedicalInfo} />
+        <Screen name="Profile" component={ProfileStack} />
       </Navigator>
     </NavigationContainer>
   );

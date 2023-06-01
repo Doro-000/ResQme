@@ -11,6 +11,7 @@ module.exports = function (api) {
           alias: {
             "@assets": "./src/assets",
             "@firebaseConfig": "./firebaseConfig.js",
+            "@utils": "./src/utils.js",
           },
         },
       ],
