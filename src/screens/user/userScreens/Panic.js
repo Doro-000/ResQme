@@ -31,7 +31,7 @@ export default function Panic({ navigation }) {
   const { setUser, setLocation } = useStoreActions((a) => a);
 
   // constants
-  const rdbRef = ref(rdb, `locations/${user.id}`);
+  const rdbRef = ref(rdb, `victims/${user.id}`);
   const userDoc = doc(db, "users", user.id);
 
   const helpImages = [
@@ -65,8 +65,8 @@ export default function Panic({ navigation }) {
     // set initial location
     await set(rdbRef, {
       ...pick(user, ["id", "name"]),
-      latlng: [location.latitude, location.longitude],
-      lastSeen: DateTime.now().valueOf(),
+      latlng: { latitude: location.latitude, longitude: location.longitude },
+      lastSeen: DateTime.now().toISO(),
     });
 
     await Location.watchPositionAsync(

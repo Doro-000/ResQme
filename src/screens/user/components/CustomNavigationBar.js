@@ -40,7 +40,7 @@ export default function CustomNavigationBar({ navigation }) {
   // funcs
   const signOut = async () => {
     try {
-      await remove(ref(rdb, `locations/${user.id}`)); // stop tracking on panic exit
+      await remove(ref(rdb, `victims/${user.id}`)); // stop tracking on panic exit
 
       const userDoc = doc(db, "users", user.id); // turn off panic mode
       await updateDoc(userDoc, { panicMode: false });

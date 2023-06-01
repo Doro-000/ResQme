@@ -57,7 +57,7 @@ export default function Calm({ navigation }) {
 
   // Funcs
   const updateVictims = async () => {
-    const rdbRef = ref(rdb, "locations");
+    const rdbRef = ref(rdb, "victims");
     const locations = await get(rdbRef);
 
     const res = [...randomVictims];

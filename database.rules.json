@@ -2,7 +2,10 @@
   "rules": {
     ".read": "auth != null",
     ".write": "auth != null",
-    "locations": {
+    "victims": {
+      ".indexOn": "id"
+    },
+    "volunteers": {
       ".indexOn": "id"
     }
   }

@@ -1,13 +1,20 @@
 const functions = require("firebase-functions");
 const fetch = require("node-fetch");
 
+const express = require("express");
+const cors = require("cors");
+
+const { getVictims } = require("./controllers/victims.js");
+const { getMedicalInfo } = require("./controllers/medicalInfo");
+const { getvolunteers } = require("./controllers/volunteers");
+
 exports.getLocationName = functions
   .runWith({ secrets: ["GOOGLE_MAP_KEY"] })
   .https.onCall(async (data, context) => {
     if (!context.auth) {
       throw new functions.https.HttpsError(
         "failed-precondition",
-        "The function must be called " + "while authenticated."
+        "The function must be called while authenticated."
       );
     }
 
@@ -17,3 +24,12 @@ exports.getLocationName = functions
 
     return await (await fetch(request_url)).json();
   });
+
+const app = express();
+app.use(cors());
+
+app.get("/getVictims", getVictims);
+app.get("/getMedicalInfo", getMedicalInfo);
+app.get("/getVolunteers", getvolunteers);
+
+exports.api = functions.https.onRequest(app);
