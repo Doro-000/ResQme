@@ -52,9 +52,7 @@ export default function MedicalInfo({ route, navigation }) {
   // FORM VALUES
   const [selectedBlood, setBlood] = useState(medicalInfo.selectedBlood ?? "");
   const [birthDate, setBDay] = useState(
-    medicalInfo.birthDate
-      ? new Date(medicalInfo.birthDate)
-      : new Date(Date.now())
+    medicalInfo.birthDate ? new Date(medicalInfo.birthDate) : new Date()
   );
 
   const [height, setHeight] = useState(

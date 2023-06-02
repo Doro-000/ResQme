@@ -14,7 +14,7 @@ import Carousel from "react-native-snap-carousel";
 import { useStoreActions, useStoreState } from "easy-peasy";
 
 // Firebase
-import { ref } from "firebase/database";
+import { ref, onChildChanged, onValue } from "firebase/database";
 import { doc, updateDoc } from "firebase/firestore";
 import { rdb, db } from "@firebaseConfig";
 
@@ -28,6 +28,7 @@ export default function Panic({ navigation }) {
   const [_, setErrorMsg] = useState(null);
   const { user, location } = useStoreState((s) => s);
   const { setUser, setLocation } = useStoreActions((a) => a);
+  const [unsubscribe, setUnsubscribe] = useState(null);
 
   // constants
   const rdbRef = ref(rdb, `victims/${user.id}`);
@@ -69,7 +70,18 @@ export default function Panic({ navigation }) {
     await exitLocationShare(rdbRef, (mode = "Idle"), user);
 
     setUser({ ...user, mode: "Idle" });
+    if (unsubscribe) {
+      unsubscribe();
+    }
     navigation.navigate("Calm");
+  }
+
+  function listenToPing() {
+    const ping = ref(rdb, `pings/${user.id}`);
+    const unsubscribe = onChildChanged(ping, (snapshot) => {
+      playSound();
+    });
+    setUnsubscribe(() => unsubscribe);
   }
 
   const renderCarouselImage = (value, index) => {
@@ -103,8 +115,15 @@ export default function Panic({ navigation }) {
 
   // UI
   useEffect(() => {
+    listenToPing();
     setPanicMode();
-    sendLocation(rdbRef, 900000, setLocation, user, location);
+    sendLocation(
+      rdbRef,
+      900000,
+      setLocation,
+      { ...user, mode: "panic" },
+      location
+    );
   }, []);
 
   useEffect(() => {

@@ -27,7 +27,7 @@ import { useStoreState } from "easy-peasy";
 // Firebase
 import { doc, getDoc } from "firebase/firestore";
 import { httpsCallable } from "firebase/functions";
-import { db, funcs } from "@firebaseConfig";
+import { rdb, db, funcs } from "@firebaseConfig";
 
 // Utils
 import { DateTime } from "luxon";
@@ -92,6 +92,7 @@ const VictimDetail = ({
 
         const lastSeen = DateTime.fromISO(victimData.lastSeen);
         setVictim({
+          id: userInfo.id,
           profilePicture: require("@assets/lego.png"),
           name: victimData.title,
           phone: userInfo.phoneNum,
@@ -164,6 +165,17 @@ const VictimDetail = ({
       changeBottomSheetActive(false);
     }
   }, []);
+
+  const ringVictimPhone = async (_) => {
+    try {
+      let ringFunction = httpsCallable(funcs, "ringVictimPhone");
+      await ringFunction({
+        victimId: victim.id ?? "None",
+      });
+    } catch (e) {
+      console.warn(e);
+    }
+  };
 
   // UI
   useEffect(() => {
@@ -339,6 +351,7 @@ const VictimDetail = ({
                         justifyContent: "center",
                         borderRadius: 100,
                       }}
+                      onPress={ringVictimPhone}
                     >
                       Press Here to make the victims phone ring !
                     </Button>
