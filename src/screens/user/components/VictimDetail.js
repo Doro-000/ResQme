@@ -12,8 +12,13 @@ import {
   Modal,
   Portal,
 } from "react-native-paper";
-import { AntDesign } from "@expo/vector-icons";
-import { Ionicons } from "@expo/vector-icons";
+import {
+  AntDesign,
+  Ionicons,
+  Fontisto,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
+
 import Carousel from "react-native-snap-carousel";
 
 // State
@@ -42,13 +47,13 @@ const VictimDetail = ({
   const [detailLoading, setDetailLoading] = useState(false);
   const [helpModal, setHelpModal] = useState(false);
 
-  const { user } = useStoreState((s) => s);
+  const { user, medicalInfo } = useStoreState((s) => s);
 
   const openHelpModal = () => setHelpModal(true);
   const closeHelpModal = () => setHelpModal(false);
 
   // constants
-  const snapPoints = useMemo(() => ["50%"], []);
+  const snapPoints = useMemo(() => ["50%", "100%"], []);
 
   const helpImages = [
     require("@assets/volunteerPage1.jpeg"),
@@ -61,7 +66,7 @@ const VictimDetail = ({
     setDetailLoading(true);
     if (!isEmpty(victimData)) {
       let locationName = null;
-      if (user.mode === "SAR") {
+      if (["ProSAR", "Independent"].includes(user.mode)) {
         locationName = await getLocationName(victimData.latlng);
       }
       if (sampleVictim) {
@@ -76,12 +81,16 @@ const VictimDetail = ({
             longitude: victimData.latlng.longitude,
           },
           locationName,
+          medicalInfo,
         });
       } else {
         const userDoc = doc(db, "users", victimData.id);
         const userInfo = (await getDoc(userDoc)).data();
 
-        const lastSeen = DateTime.fromMillis(victimData.lastSeen);
+        const medicalInfoDoc = doc(db, "userMedicalInfo", victimData.id);
+        const medicalInfo = (await getDoc(medicalInfoDoc)).data();
+
+        const lastSeen = DateTime.fromISO(victimData.lastSeen);
         setVictim({
           profilePicture: require("@assets/lego.png"),
           name: victimData.title,
@@ -93,6 +102,7 @@ const VictimDetail = ({
             longitude: victimData.latlng.longitude,
           },
           locationName,
+          medicalInfo,
         });
       }
     }
@@ -160,6 +170,108 @@ const VictimDetail = ({
     getVictimData();
   }, [victimData]);
 
+  const renderMedicalInfo = () => {
+    if (victim.medicalInfo) {
+      const { medicalInfo } = victim;
+      return (
+        <>
+          <Text variant="titleLarge" style={{ marginTop: 10 }}>
+            Medical Information
+          </Text>
+          <View style={styles.sectionCard}>
+            <View style={styles.victimInfo}>
+              <View style={styles.victimInfoItem}>
+                <Fontisto name="blood-drop" size={20} />
+                <Text>{medicalInfo.selectedBlood ?? "Not available"}</Text>
+              </View>
+              <View style={styles.victimInfoItem}>
+                <Fontisto name="date" size={20} />
+                <Text>
+                  {medicalInfo.birthDate
+                    ? DateTime.fromISO(medicalInfo.birthDate).toLocaleString()
+                    : "Not available"}
+                </Text>
+              </View>
+              <View style={styles.victimInfoItem}>
+                <MaterialCommunityIcons name="human-male-height" size={20} />
+                <Text>{medicalInfo.height ?? "Not available"}</Text>
+              </View>
+              <View style={styles.victimInfoItem}>
+                <MaterialCommunityIcons name="weight-kilogram" size={20} />
+                <Text>{medicalInfo.weight ?? "Not available"}</Text>
+              </View>
+              <View style={styles.victimInfoItem}>
+                <MaterialCommunityIcons
+                  name="gender-male-female-variant"
+                  size={20}
+                />
+                <Text>{medicalInfo.gender ?? "Not available"}</Text>
+              </View>
+              <View style={styles.victimInfoItem}>
+                <MaterialCommunityIcons name="allergy" size={20} />
+                <Text
+                  style={{
+                    flexWrap: "wrap",
+                  }}
+                >
+                  {medicalInfo.allergies ?? "Not available"}
+                </Text>
+              </View>
+              <View style={styles.victimInfoItem}>
+                <MaterialCommunityIcons name="medical-bag" size={20} />
+                <Text
+                  style={{
+                    flexWrap: "wrap",
+                  }}
+                >
+                  {medicalInfo.currentMedications ?? "Not available"}
+                </Text>
+              </View>
+              <View style={styles.victimInfoItem}>
+                <MaterialCommunityIcons name="doctor" size={20} />
+                <Text
+                  style={{
+                    flexWrap: "wrap",
+                  }}
+                >
+                  {medicalInfo.medicalConditions ?? "Not available"}
+                </Text>
+              </View>
+              <View style={styles.victimInfoItem}>
+                <MaterialCommunityIcons name="hand-heart" size={20} />
+                <Text
+                  style={{
+                    flexWrap: "wrap",
+                  }}
+                >
+                  {medicalInfo.organDonor ? "Organ Donor" : "Not Organ Donor"}
+                </Text>
+              </View>
+            </View>
+          </View>
+        </>
+      );
+    }
+    return (
+      <View style={[styles.sectionCard, styles.warningCard]}>
+        <IconButton
+          icon="information"
+          size={15}
+          mode="outlined"
+          iconColor="black"
+        />
+        <Text
+          variant="bodySmall"
+          style={{
+            flexShrink: 1,
+          }}
+        >
+          This User has not provided their Medical Information.
+        </Text>
+      </View>
+    );
+  };
+
   return (
     <BottomSheet
       ref={bottomSheetRef}
@@ -217,12 +329,24 @@ const VictimDetail = ({
                     )}
                   </View>
                 </View>
-                {user.mode === "ProSAR" ? (
+                {["ProSAR", "Independent"].includes(user.mode) ? (
                   <>
+                    <Button
+                      icon="bell-alert"
+                      mode="contained"
+                      style={{
+                        padding: 8,
+                        justifyContent: "center",
+                        borderRadius: 100,
+                      }}
+                    >
+                      Press Here to make the victims phone ring !
+                    </Button>
                     <View style={[styles.sectionCard, styles.ngoInfoCard]}>
                       <View style={styles.victimInfoItem}>
                         <AntDesign name="pushpino" size={20} />
-                        <Text numberOfLines={1}>
+
+                        <Text style={{ flexShrink: 1 }}>
                           {loading
                             ? "Fetching Location Name"
                             : victim.locationName}
@@ -237,18 +361,7 @@ const VictimDetail = ({
                         <Text>{victim.bpm}</Text>
                       </View>
                     </View>
-
-                    <Button
-                      icon="bell-alert"
-                      mode="contained"
-                      style={{
-                        marginTop: 10,
-                        height: "15%",
-                        justifyContent: "center",
-                      }}
-                    >
-                      Press Here to make the victims phone ring !
-                    </Button>
+                    {renderMedicalInfo()}
                   </>
                 ) : (
                   <>
@@ -383,6 +496,14 @@ const styles = StyleSheet.create({
   ngoInfoCard: {
     flexDirection: "column",
     gap: 10,
+  },
+  warningCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#e6b800",
+    paddingHorizontal: 5,
+    paddingVertical: 10,
+    borderRadius: 10,
   },
 });
 

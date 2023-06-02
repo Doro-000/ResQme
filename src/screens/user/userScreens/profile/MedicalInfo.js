@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback } from "react";
 
 // UI
 import {
@@ -19,7 +19,6 @@ import {
 } from "react-native-paper";
 import { SelectList } from "react-native-dropdown-select-list";
 import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
-import { MaskedTextInput } from "react-native-mask-text";
 
 // STATE
 import { useStoreState, useStoreActions } from "easy-peasy";
@@ -28,6 +27,15 @@ import { useStoreState, useStoreActions } from "easy-peasy";
 import { doc, setDoc, collection } from "firebase/firestore";
 import { db } from "@firebaseConfig";
 import { isEmpty } from "lodash";
+
+const bloodTypes = ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"].map(
+  (type, idx) => {
+    return {
+      key: idx,
+      value: type,
+    };
+  }
+);
 
 export default function MedicalInfo({ route, navigation }) {
   const { user, medicalInfo } = useStoreState((s) => s);
@@ -44,13 +52,16 @@ export default function MedicalInfo({ route, navigation }) {
   // FORM VALUES
   const [selectedBlood, setBlood] = useState(medicalInfo.selectedBlood ?? "");
   const [birthDate, setBDay] = useState(
-    new Date(medicalInfo.birthdate ?? Date.now())
+    medicalInfo.birthDate
+      ? new Date(medicalInfo.birthDate)
+      : new Date(Date.now())
   );
+
   const [height, setHeight] = useState(
-    medicalInfo.height ? medicalInfo.height.toString() : ""
+    medicalInfo.height ? medicalInfo.height.toString() : null
   );
   const [weight, setWeight] = useState(
-    medicalInfo.weight ? medicalInfo.weight.toString() : ""
+    medicalInfo.weight ? medicalInfo.weight.toString() : null
   );
   const [gender, setGender] = useState(medicalInfo.gender ?? "");
 
@@ -62,17 +73,6 @@ export default function MedicalInfo({ route, navigation }) {
     medicalInfo.medicalConditions ?? ""
   );
   const [organDonor, setOrganDonor] = useState(medicalInfo.organDonor ?? false);
-
-  const bloodTypes = useMemo(
-    () =>
-      ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"].map((type, idx) => {
-        return {
-          key: idx,
-          value: type,
-        };
-      }),
-    []
-  );
 
   // FUNCS
   const toggleEdit = () => {
@@ -93,9 +93,9 @@ export default function MedicalInfo({ route, navigation }) {
 
       const medicalInfo = {
         selectedBlood: bloodT,
-        birthDate,
-        height: parseFloat(height),
-        weight: parseFloat(weight),
+        birthDate: birthDate.toISOString(),
+        height: parseFloat(height) ?? 0,
+        weight: parseFloat(weight) ?? 0,
         gender,
         allergies,
         currentMedications,
@@ -211,7 +211,7 @@ export default function MedicalInfo({ route, navigation }) {
               <TextInput
                 editable={false}
                 disabled={!isEditing}
-                value={birthDate.toDateString()}
+                value={birthDate.toLocaleDateString()}
                 mode="outlined"
                 style={{
                   flexGrow: 1,
@@ -251,9 +251,8 @@ export default function MedicalInfo({ route, navigation }) {
                 placeholder="Height in Meter"
                 mode={"outlined"}
                 keyboardType="numeric"
-                onChangeText={(height) => setHeight(height)}
+                onChangeText={setHeight}
                 value={height}
-                render={(props) => <MaskedTextInput {...props} mask="9.99" />}
                 disabled={!isEditing}
               />
             </View>
@@ -267,7 +266,7 @@ export default function MedicalInfo({ route, navigation }) {
                 placeholder="Weight in KG"
                 mode={"outlined"}
                 keyboardType="numeric"
-                onChangeText={(weight) => setWeight(weight)}
+                onChangeText={setWeight}
                 value={weight}
                 disabled={!isEditing}
               />
