@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ResQme API Documentation</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.15/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      /* Material UI-inspired style */
+      .bg-primary {
+        background-color: #007aff;
+      }
+
+      .text-primary {
+        color: #007aff;
+      }
+
+      .bg-secondary {
+        background-color: #8e8e93;
+      }
+
+      .text-secondary {
+        color: #8e8e93;
+      }
+
+      .bg-info {
+        background-color: #5ac8fa;
+      }
+
+      .text-info {
+        color: #5ac8fa;
+      }
+
+      .bg-success {
+        background-color: #34c759;
+      }
+
+      .text-success {
+        color: #34c759;
+      }
+
+      .bg-warning {
+        background-color: #ffcc00;
+      }
+
+      .text-warning {
+        color: #ffcc00;
+      }
+
+      .bg-error {
+        background-color: #ff3b30;
+      }
+
+      .text-error {
+        color: #ff3b30;
+      }
+    </style>
+  </head>
+
+  <body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8">
+      <h1 class="text-3xl font-bold mb-4">ResQme API Documentation</h1>
+
+      <p class="mb-8">
+        The ResQme API allows organizations to retrieve information about
+        victims, medical information, and volunteers related to emergency
+        situations from the ResQme service. The API provides various endpoints
+        to access this information based on specific filters. The base URL for
+        the API is <code>https://resqme.me/api</code>. <br /><br />⚠️ The JSON
+        string (filter) has to be URL encoded during request.
+      </p>
+
+      <h2 class="text-2xl font-bold mb-4">Table of Contents</h2>
+      <ol class="list-decimal list-inside mb-8">
+        <li><a href="#get-victims">Get Victims</a></li>
+        <li><a href="#get-medical-information">Get Medical Information</a></li>
+        <li><a href="#get-volunteers">Get Volunteers</a></li>
+      </ol>
+
+      <hr class="mb-8" />
+
+      <div id="get-victims" class="mb-8">
+        <h2 class="text-2xl font-bold mb-4">Get Victims</h2>
+
+        <h3 class="text-xl font-bold mb-2">Endpoint: /getVictims</h3>
+        <p>
+          This endpoint allows users to retrieve information about victims based
+          on specified filters.
+        </p>
+
+        <h4 class="text-lg font-bold mt-4">Request</h4>
+        <ul class="list-disc list-inside mb-4">
+          <li>Method: GET</li>
+          <li>Path: /getVictims</li>
+        </ul>
+
+        <h4 class="text-lg font-bold">Query Parameters</h4>
+        <p>The following query parameters can be used to filter the results:</p>
+        <ul class="list-disc list-inside mb-4">
+          <li>
+            filter: JSON string containing filter parameters (optional). The
+            filters are explained in detail in the following section.
+          </li>
+          <ul class="list-disc list-inside ml-4">
+            <li>
+              <span class="text-primary">radius</span>: Represents the circular
+              area within a specified radius.
+              <ul class="list-disc list-inside ml-4">
+                <li>
+                  latitude: Latitude coordinate of the center point of the
+                  radius.
+                </li>
+                <li>
+                  longitude: Longitude coordinate of the center point of the
+                  radius.
+                </li>
+                <li>distance: Distance of the radius from the center point.</li>
+                <li>
+                  unit: Unit of measurement for the distance, valid values are
+                  "KM" (kilometers) or "MI" (miles).
+                </li>
+              </ul>
+            </li>
+            <li>
+              <span class="text-primary">polygon</span>: Represents a polygon
+              area defined by multiple vertices.
+              <ul class="list-disc list-inside ml-4">
+                <li>
+                  vertices: Array of vertices that define the polygon. Each
+                  vertex is an array of two numbers representing the latitude
+                  and longitude coordinates.
+                </li>
+              </ul>
+            </li>
+            <li>
+              <span class="text-primary">time</span>: Represents a time range.
+              <ul class="list-disc list-inside ml-4">
+                <li>from: Start time of the range in ISO 8601 format.</li>
+                <li>
+                  to: End time of the range in ISO 8601 format. If not provided,
+                  the current time is used as the default value.
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </ul>
+
+        <h4 class="text-lg font-bold">Example Request</h4>
+        <pre
+          class="bg-gray-200 p-4 rounded-lg overflow-auto"
+        ><code>filter={"radius":{"latitude": 37.7749, "longitude": -122.4194, "distance": 10, "unit": "MI"}}
+
+GET https://resqme.me/api/getVictims?filter=%7B%22radius%22%3A%7B%22latitude%22%3A%2037.7749,%20%22longitude%22%3A%20-122.4194,%20%22distance%22%3A%2010,%20%22unit%22%3A%20%22MI%22%7D%7D</code></pre>
+
+        <h4 class="text-lg font-bold">Response</h4>
+        <ul class="list-disc list-inside mb-4">
+          <li>Status: 200 OK</li>
+          <li>Content-Type: application/json</li>
+        </ul>
+
+        <h4 class="text-lg font-bold">Example Response</h4>
+        <pre class="bg-gray-200 p-4 rounded-lg"><code>[
+  {
+    "id": "victim1",
+    "name": "John Doe",
+    "location": {
+      "latitude": 37.7749,
+      "longitude": -122.4194
+    },
+    "status": "Panic"
+  },
+  {
+    "id": "victim2",
+    "name": "Jane Smith",
+    "location": {
+      "latitude": 37.7739,
+      "longitude": -122.4134
+    },
+    "status": "Panic"
+  }
+]</code></pre>
+      </div>
+
+      <hr class="mb-8" />
+
+      <div id="get-medical-information" class="mb-8">
+        <h2 class="text-2xl font-bold mb-4">Get Medical Information</h2>
+
+        <h3 class="text-xl font-bold mb-2">Endpoint: /getMedicalInfo</h3>
+        <p>
+          This endpoint allows users to retrieve medical information for
+          specific victims.
+        </p>
+
+        <h4 class="text-lg font-bold mt-4">Request</h4>
+        <ul class="list-disc list-inside mb-4">
+          <li>Method: GET</li>
+          <li>Path: /getMedicalInfo</li>
+        </ul>
+
+        <h4 class="text-lg font-bold">Query Parameters</h4>
+        <p>The following query parameters can be used to filter the results:</p>
+        <ul class="list-disc list-inside mb-4">
+          <li>
+            filter: JSON string containing field victimIds that has a list of
+            user Ids.
+          </li>
+        </ul>
+
+        <h4 class="text-lg font-bold">Example Request</h4>
+        <pre
+          class="bg-gray-200 p-4 rounded-lg overflow-auto"
+        ><code>filter={"victimIds":["victim1"]}
+
+GET https://resqme.me/api/getMedicalInfo?filter=%7B%22victimIds%22%3A%5B%22victim1%22,%22victim2%22%5D%7D</code></pre>
+
+        <h4 class="text-lg font-bold">Response</h4>
+        <ul class="list-disc list-inside mb-4">
+          <li>Status: 200 OK</li>
+          <li>Content-Type: application/json</li>
+        </ul>
+
+        <h4 class="text-lg font-bold">Example Response</h4>
+        <pre class="bg-gray-200 p-4 rounded-lg"><code>[
+  {
+    "id": "victim1",
+    "selectedBlood": "AB+",
+    "birthDate": "1990-05-15",
+    "height": 175.5,
+    "weight": 70.2,
+    "gender": "Male",
+    "allergies": "Pollen, Dust",
+    "currentMedications": "Aspirin, Lisinopril",
+    "medicalConditions": "Hypertension, Asthma",
+    "organDonor": true
+  }
+]</code></pre>
+      </div>
+
+      <hr class="mb-8" />
+
+      <div id="get-volunteers" class="mb-8">
+        <h2 class="text-2xl font-bold mb-4">Get Volunteers</h2>
+
+        <h3 class="text-xl font-bold mb-2">Endpoint: /getVolunteers</h3>
+        <p>
+          This endpoint allows users to retrieve information about volunteers
+          based on specified filters.
+        </p>
+
+        <h4 class="text-lg font-bold mt-4">Request</h4>
+        <ul class="list-disc list-inside mb-4">
+          <li>Method: GET</li>
+          <li>Path: /getVolunteers</li>
+        </ul>
+
+        <h4 class="text-lg font-bold">Query Parameters</h4>
+        <p>The following query parameters can be used to filter the results:</p>
+        <ul class="list-disc list-inside mb-4">
+          <li>filter: JSON string containing filter parameters (optional)</li>
+        </ul>
+
+        <h4 class="text-lg font-bold">Example Request</h4>
+        <pre
+          class="bg-gray-200 p-4 rounded-lg overflow-auto"
+        ><code>filter={"radius":{"latitude": 37.7749, "longitude": -122.4194, "distance": 10, "unit": "MI"}, "type": "ProSAR"}
+
+GET https://resqme.me/api/getVolunteers?filter=%7B%22radius%22%3A%7B%22latitude%22%3A%2037.7749,%20%22longitude%22%3A%20-122.4194,%20%22distance%22%3A%2010,%20%22unit%22%3A%20%22MI%22%7D,%20%22type%22%3A%20%22ProSAR%22%7D</code></pre>
+        <h4 class="text-lg font-bold">Response</h4>
+        <ul class="list-disc list-inside mb-4">
+          <li>Status: 200 OK</li>
+          <li>Content-Type: application/json</li>
+        </ul>
+
+        <h4 class="text-lg font-bold">Example Response</h4>
+        <pre class="bg-gray-200 p-4 rounded-lg"><code>[
+  {
+    "id": "volunteer1",
+    "name": "Sarah Johnson",
+    "location": {
+      "latitude": 37.7749,
+      "longitude": -122.4194
+    },
+    "type": "ProSAR"
+  },
+  {
+    "id": "volunteer2",
+    "name": "Michael Smith",
+    "location": {
+      "latitude": 37.7739,
+      "longitude": -122.4134
+    },
+    "type": "ProSAR"
+  }
+]</code></pre>
+      </div>
+      <hr class="mb-8" />
+
+      <footer class="text-center">
+        <p class="text-secondary">ResQme API Documentation</p>
+        <p class="text-secondary">© 2023 ResQme. All rights reserved.</p>
+      </footer>
+    </div>
+  </body>
+</html>

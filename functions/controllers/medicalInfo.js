@@ -3,10 +3,16 @@ const { db } = require("../firebaseConfig");
 const firebase = require("firebase-admin");
 
 const getMedicalInfo = async (req, res) => {
-  const filter = JSON.parse(req.query.filter ?? "{}");
-  const { error } = medicalInfoSchema.validate(filter);
-  if (error) {
-    res.status(400).json({ error: error.message });
+  let filter = {};
+  try {
+    filter = JSON.parse(req.query.filter ?? "{}");
+    const { error } = medicalInfoSchema.validate(filter);
+    if (error) {
+      res.status(400).json({ error: error.message });
+      return;
+    }
+  } catch (e) {
+    res.status(400).json({ error: "Invalid JSON" });
     return;
   }
 
