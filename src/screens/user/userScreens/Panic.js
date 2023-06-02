@@ -3,7 +3,6 @@ import { useState, useEffect, useRef } from "react";
 
 // EXPO
 import { Audio } from "expo-av";
-import * as Location from "expo-location";
 
 // UI
 import { FAB, Text, Banner, IconButton } from "react-native-paper";
@@ -104,8 +103,8 @@ export default function Panic({ navigation }) {
 
   // UI
   useEffect(() => {
-    sendLocation(rdbRef, 900000, setLocation, user, location);
     setPanicMode();
+    sendLocation(rdbRef, 900000, setLocation, user, location);
   }, []);
 
   useEffect(() => {

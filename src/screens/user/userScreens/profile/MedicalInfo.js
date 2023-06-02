@@ -15,6 +15,7 @@ import {
   RadioButton,
   Divider,
   Button,
+  Checkbox,
 } from "react-native-paper";
 import { SelectList } from "react-native-dropdown-select-list";
 import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
@@ -52,9 +53,15 @@ export default function MedicalInfo({ route, navigation }) {
     medicalInfo.weight ? medicalInfo.weight.toString() : ""
   );
   const [gender, setGender] = useState(medicalInfo.gender ?? "");
-  const [additionalInfo, setAdditionalInfo] = useState(
-    medicalInfo.additionalInfo ?? ""
+
+  const [allergies, setAllergies] = useState(medicalInfo.allergies ?? "");
+  const [currentMedications, setCurrentMedications] = useState(
+    medicalInfo.currentMedications ?? ""
   );
+  const [medicalConditions, setMedicalConditions] = useState(
+    medicalInfo.medicalConditions ?? ""
+  );
+  const [organDonor, setOrganDonor] = useState(medicalInfo.organDonor ?? false);
 
   const bloodTypes = useMemo(
     () =>
@@ -90,7 +97,10 @@ export default function MedicalInfo({ route, navigation }) {
         height: parseFloat(height),
         weight: parseFloat(weight),
         gender,
-        additionalInfo,
+        allergies,
+        currentMedications,
+        medicalConditions,
+        organDonor,
       };
 
       await setDoc(
@@ -131,7 +141,6 @@ export default function MedicalInfo({ route, navigation }) {
         style={style.layout}
         keyboardVerticalOffset={headerHeight}
         behavior="padding"
-        enabled
       >
         {/* Title */}
         <View style={style.titleCard}>
@@ -237,8 +246,8 @@ export default function MedicalInfo({ route, navigation }) {
                 flexGrow: 1,
               }}
             >
-              <Text variant="titleMedium">Height</Text>
               <TextInput
+                label={"Height"}
                 placeholder="Height in Meter"
                 mode={"outlined"}
                 keyboardType="numeric"
@@ -253,8 +262,8 @@ export default function MedicalInfo({ route, navigation }) {
                 flexGrow: 1,
               }}
             >
-              <Text variant="titleMedium">Weight</Text>
               <TextInput
+                label={"Weight"}
                 placeholder="Weight in KG"
                 mode={"outlined"}
                 keyboardType="numeric"
@@ -301,50 +310,84 @@ export default function MedicalInfo({ route, navigation }) {
 
           {/* Other conditions */}
           <View>
-            <Text variant="titleMedium">Additional Information</Text>
             <TextInput
               multiline
+              label={"Allergies"}
               mode="outlined"
-              placeholder="Please state any conditions you have."
-              value={additionalInfo}
-              onChangeText={(text) => setAdditionalInfo(text)}
+              placeholder="Please state any allergies you have."
+              value={allergies}
+              onChangeText={(text) => setAllergies(text)}
               disabled={!isEditing}
             />
           </View>
-        </View>
 
-        {isEditing ? (
-          <View
-            style={{
-              flexDirection: "row",
-              gap: 10,
-              alignSelf: "flex-end",
-            }}
-          >
-            <Button
-              icon="check-bold"
-              mode="contained"
-              onPress={updateMedicalInfo}
-              loading={loading}
-            >
-              Save
-            </Button>
-            <Button icon="cancel" mode="text" onPress={toggleEdit}>
-              cancel
-            </Button>
+          <View>
+            <TextInput
+              label={"Current Medications"}
+              multiline
+              mode="outlined"
+              placeholder="Please state any medications you are taking."
+              value={currentMedications}
+              onChangeText={(text) => setCurrentMedications(text)}
+              disabled={!isEditing}
+            />
           </View>
-        ) : (
-          <Button
-            icon="pencil"
-            mode="contained"
-            onPress={toggleEdit}
-            style={{
-              alignSelf: "flex-end",
-            }}
-          >
-            Edit
-          </Button>
-        )}
+
+          <View>
+            <TextInput
+              label={"Medical Conditions"}
+              multiline
+              mode="outlined"
+              placeholder="Please state any medical conditions you have."
+              value={medicalConditions}
+              onChangeText={(text) => setMedicalConditions(text)}
+              disabled={!isEditing}
+            />
+          </View>
+          <View>
+            <Checkbox.Item
+              disabled={!isEditing}
+              label="Organ Donor"
+              status={organDonor ? "checked" : "unchecked"}
+              onPress={() => {
+                setOrganDonor(!organDonor);
+              }}
+            />
+          </View>
+          <Divider />
+          {isEditing ? (
+            <View
+              style={{
+                flexDirection: "row",
+                gap: 10,
+                alignSelf: "flex-end",
+              }}
+            >
+              <Button
+                icon="check-bold"
+                mode="contained"
+                onPress={updateMedicalInfo}
+                loading={loading}
+              >
+                Save
+              </Button>
+              <Button icon="cancel" mode="text" onPress={toggleEdit}>
+                cancel
+              </Button>
+            </View>
+          ) : (
+            <Button
+              icon="pencil"
+              mode="contained"
+              onPress={toggleEdit}
+              style={{
+                alignSelf: "flex-end",
+              }}
+            >
+              Edit
+            </Button>
+          )}
+        </View>
       </KeyboardAvoidingView>
     </ScrollView>
   );
@@ -352,7 +395,6 @@ export default function MedicalInfo({ route, navigation }) {
 
 const style = StyleSheet.create({
   layout: {
-    flex: 1,
     backgroundColor: "white",
     gap: 5,
     padding: "2%",

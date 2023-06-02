@@ -198,16 +198,18 @@ export default function Calm({ navigation }) {
         flex: 1,
       }}
     >
-      <Banner visible={user.mode === "Independent"} icon={"information"}>
-        <Text
-          variant="titleMedium"
-          style={{
-            lineHeight: 40,
-          }}
-        >
+      <Banner
+        visible={user.mode === "Independent"}
+        icon={"information"}
+        contentStyle={{
+          backgroundColor: "#d1c4e9",
+        }}
+      >
+        <Text>
           Sharing your contact and location with professional teams...
         </Text>
       </Banner>
+
       <View style={style.mapStyle}>
         <Map
           mapRef={mapRef}

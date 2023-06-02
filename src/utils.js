@@ -9,7 +9,7 @@ import { DateTime } from "luxon";
 async function sendLocation(rdbRef, time, locationUpdate, user, location) {
   // set initial location
   await set(rdbRef, {
-    ...pick(user, ["id", "name", "phoneNum"]),
+    ...pick(user, ["id", "name", "phoneNum", "mode"]),
     latlng: { latitude: location.latitude, longitude: location.longitude },
     lastSeen: DateTime.now().toISO(),
   });

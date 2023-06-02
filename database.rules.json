@@ -3,10 +3,10 @@
     ".read": "auth != null",
     ".write": "auth != null",
     "victims": {
-      ".indexOn": "id"
+      ".indexOn": "lastSeen"
     },
     "volunteers": {
-      ".indexOn": "id"
+      ".indexOn": "lastSeen"
     }
   }
 }

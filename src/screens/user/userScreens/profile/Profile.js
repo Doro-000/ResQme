@@ -111,7 +111,7 @@ export default function Profile({ navigation }) {
           icon="pencil"
           mode="text"
           onPress={() => {
-            navigation.navigate("ProfileInfo");
+            navigation.navigate("ProfileInfo", { editMode: true });
           }}
         >
           Edit
@@ -124,7 +124,7 @@ export default function Profile({ navigation }) {
           icon="pencil"
           mode="text"
           onPress={() => {
-            navigation.navigate("MedicalInfo", { editMode: false });
+            navigation.navigate("MedicalInfo", { editMode: true });
           }}
         >
           Edit

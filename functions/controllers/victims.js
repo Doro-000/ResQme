@@ -3,26 +3,39 @@ const { haversineDistance, isInPolygon } = require("../utils");
 const { rdb } = require("../firebaseConfig");
 
 const getVictims = async (req, res) => {
-  const filter = JSON.parse(req.query.filter ?? "{}");
-  const { error } = victimsFilterSchema.validate(filter);
-  if (error) {
-    res.status(400).json({ error: error.message });
+  let filter = {};
+  try {
+    filter = JSON.parse(req.query.filter ?? "{}");
+    const { error } = victimsFilterSchema.validate(filter);
+    if (error) {
+      res.status(400).json({ error: error.message });
+      return;
+    }
+  } catch (e) {
+    res.status(400).json({ error: "Invalid JSON" });
     return;
   }
 
-  const locations = rdb.ref("locations");
+  const locations = rdb.ref("victims");
   const { time, radius, polygon } = filter;
 
-  const { from, to } = time;
   let victims = locations.orderByChild("lastSeen");
 
-  if (from && to) {
-    victims.startAt(from).endAt(to);
-  } else if (from) {
-    victims.startAt(from);
+  if (time) {
+    const { from, to } = time;
+    if (from && to) {
+      victims.startAt(from).endAt(to);
+    } else if (from) {
+      victims.startAt(from);
+    }
   }
 
-  victims = (await victims.get()).toJSON() ?? [];
+  const result = (await victims.get()) ?? [];
+  victims = [];
+
+  result.forEach((snapshot) => {
+    victims.push(snapshot.val());
+  });
 
   if (radius || polygon) {
     if (radius) {

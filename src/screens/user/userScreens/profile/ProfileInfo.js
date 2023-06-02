@@ -21,12 +21,13 @@ import { useStoreState, useStoreActions } from "easy-peasy";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@firebaseConfig";
 
-export default function ProfileInfo({ navigation }) {
+export default function ProfileInfo({ route, navigation }) {
   const { user } = useStoreState((s) => s);
   const { setUser } = useStoreActions((a) => a);
+  const { editMode } = route.params;
 
   // FORM STATE
-  const [isEditing, setEditing] = useState(false);
+  const [isEditing, setEditing] = useState(editMode ?? false);
   const [email, setEmail] = useState(user.email);
   const [name, setName] = useState(user.name);
   const [phoneNum, setPhoneNumber] = useState(user.phoneNum);

@@ -3,30 +3,46 @@ const { haversineDistance, isInPolygon } = require("../utils");
 const { rdb } = require("../firebaseConfig");
 
 const getvolunteers = async (req, res) => {
-  const filter = JSON.parse(req.query.filter ?? "{}");
-  const { error } = volunteerFilterSchema.validate(filter);
-  if (error) {
-    res.status(400).json({ error: error.message });
+  let filter = {};
+  try {
+    filter = JSON.parse(req.query.filter ?? "{}");
+    const { error } = volunteerFilterSchema.validate(filter);
+    if (error) {
+      res.status(400).json({ error: error.message });
+      return;
+    }
+  } catch (e) {
+    res.status(400).json({ error: "Invalid JSON" });
     return;
   }
 
   const locations = rdb.ref("volunteers");
   const { time, radius, polygon, type } = filter;
 
-  const { from, to } = time;
   let volunteers = locations.orderByChild("lastSeen");
 
-  if (from && to) {
-    volunteers.startAt(from).endAt(to);
-  } else if (from) {
-    volunteers.startAt(from);
+  if (time) {
+    const { from, to } = time;
+    if (from && to) {
+      volunteers.startAt(from).endAt(to);
+    } else if (from) {
+      volunteers.startAt(from);
+    }
   }
 
-  if (type) {
-    volunteers.orderByChild("type").equalTo(type);
-  }
+  const result = (await volunteers.get()) ?? [];
+  volunteers = [];
 
-  volunteers = (await volunteers.get()).toJSON() ?? [];
+  result.forEach((snapshot) => {
+    data = snapshot.val();
+    if (type) {
+      if (data.mode === type) {
+        volunteers.push(data);
+      }
+    } else {
+      volunteers.push(data);
+    }
+  });
 
   if (radius || polygon) {
     if (radius) {
@@ -36,7 +52,7 @@ const getvolunteers = async (req, res) => {
 
       volunteers = volunteers.filter((volunteer) => {
         const calculatedDistance = haversineDistance(
-          volunteer.latng,
+          volunteer.latlng,
           { latitude, longitude },
           isMiles
         );

@@ -28,8 +28,8 @@ exports.getLocationName = functions
 const app = express();
 app.use(cors());
 
-app.get("/getVictims", getVictims);
-app.get("/getMedicalInfo", getMedicalInfo);
-app.get("/getVolunteers", getvolunteers);
+app.get("/api/getVictims", getVictims);
+app.get("/api/getMedicalInfo", getMedicalInfo);
+app.get("/api/getVolunteers", getvolunteers);
 
 exports.api = functions.https.onRequest(app);
