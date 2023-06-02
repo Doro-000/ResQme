@@ -9,7 +9,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { NavigationContainer } from "@react-navigation/native";
 
 // UI
-import { Panic, Calm, ProfileStack } from "./userScreens";
+import { Panic, Calm, ProfileStack, VolunteerHelp } from "./userScreens";
 import CustomNavigationBar from "./components/CustomNavigationBar";
 
 const { Navigator, Screen } = createNativeStackNavigator();
@@ -32,6 +32,7 @@ export default function UserStack({ hideSplash }) {
           options={{ headerShown: false }}
         />
         <Screen name="Profile" component={ProfileStack} />
+        <Screen name="howTo" component={VolunteerHelp} />
       </Navigator>
     </NavigationContainer>
   );

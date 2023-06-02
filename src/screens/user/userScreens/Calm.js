@@ -6,7 +6,7 @@ import { View, StyleSheet } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { SwipeButton } from "react-native-expo-swipe-button";
 import { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
-import { SegmentedButtons, Banner, Text } from "react-native-paper";
+import { SegmentedButtons, Banner, Text, Button } from "react-native-paper";
 
 import Map from "../components/Map";
 import VictimDetail from "../components/VictimDetail";
@@ -192,6 +192,66 @@ export default function Calm({ navigation }) {
     }
   }, [isFocused]);
 
+  const renderBottomButton = () => {
+    if (user.mode === "ProSAR") {
+      return (
+        <SegmentedButtons
+          value={mapMode}
+          onValueChange={changeMapType}
+          style={style.segmentedButtonStyle}
+          buttons={[
+            {
+              value: "heatMap",
+              label: "Heat map 🔥",
+              showSelectedCheck: true,
+            },
+            {
+              value: "pin",
+              label: "Map pins 📍",
+              showSelectedCheck: true,
+            },
+          ]}
+          density="regular"
+        />
+      );
+    } else if (user.mode === "Independent") {
+      return (
+        <View style={style.segmentedButtonStyle}>
+          <Button onPress={() => navigation.navigate("howTo")} mode="contained">
+            Resources 📕
+          </Button>
+        </View>
+      );
+    } else {
+      return (
+        <SwipeButton
+          goBackToStart
+          Icon={
+            <MaterialIcons
+              name="keyboard-arrow-right"
+              size={50}
+              color="#DD404B"
+            />
+          }
+          iconContainerStyle={{
+            backgroundColor: "#152228",
+          }}
+          onComplete={() => navigation.navigate("Panic")}
+          title="RESCUE ME !"
+          borderRadius={180}
+          underlayTitle="Release to complete"
+          underlayTitleStyle={{ color: "white" }}
+          containerStyle={style.swipeButtonStyle}
+          completeThresholdPercentage={80}
+          titleStyle={{
+            color: "white",
+            fontWeight: "bold",
+          }}
+        />
+      );
+    }
+  };
+
   return (
     <View
       style={{
@@ -224,57 +284,7 @@ export default function Calm({ navigation }) {
         </Map>
       </View>
 
-      {user.mode === undefined ? (
-        <></>
-      ) : (
-        <>
-          {user.mode === "ProSAR" ? (
-            <SegmentedButtons
-              value={mapMode}
-              onValueChange={changeMapType}
-              style={style.segmentedButtonStyle}
-              buttons={[
-                {
-                  value: "heatMap",
-                  label: "Heat map 🔥",
-                  showSelectedCheck: true,
-                },
-                {
-                  value: "pin",
-                  label: "Map pins 📍",
-                  showSelectedCheck: true,
-                },
-              ]}
-              density="regular"
-            />
-          ) : (
-            <SwipeButton
-              goBackToStart
-              Icon={
-                <MaterialIcons
-                  name="keyboard-arrow-right"
-                  size={50}
-                  color="#DD404B"
-                />
-              }
-              iconContainerStyle={{
-                backgroundColor: "#152228",
-              }}
-              onComplete={() => navigation.navigate("Panic")}
-              title="RESCUE ME !"
-              borderRadius={180}
-              underlayTitle="Release to complete"
-              underlayTitleStyle={{ color: "white" }}
-              containerStyle={style.swipeButtonStyle}
-              completeThresholdPercentage={80}
-              titleStyle={{
-                color: "white",
-                fontWeight: "bold",
-              }}
-            />
-          )}
-        </>
-      )}
+      {user.mode === undefined ? <></> : <>{renderBottomButton()}</>}
 
       <VictimDetail
         changeBottomSheetActive={setBottomSheetActive}

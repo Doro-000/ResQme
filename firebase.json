@@ -7,6 +7,7 @@
     "indexes": "firestore.indexes.json"
   },
   "hosting": {
+    "public": "./functions/public",
     "rewrites": [
       {
         "source": "/api/**",

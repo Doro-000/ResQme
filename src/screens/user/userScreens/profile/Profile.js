@@ -61,7 +61,7 @@ export default function Profile({ navigation }) {
         await exitLocationShare(rdbRef, pendingMode, user);
       } else {
         if (pendingMode === "Independent") {
-          await sendLocation(rdbRef, 60000, setLocation, user, location); // Every 15 minutes
+          await sendLocation(rdbRef, 900000, setLocation, user, location); // Every 15 minutes
         }
 
         const userDoc = doc(db, "users", user.id);

@@ -60,6 +60,10 @@ const VictimDetail = ({
   const getVictimData = async () => {
     setDetailLoading(true);
     if (!isEmpty(victimData)) {
+      let locationName = null;
+      if (user.mode === "SAR") {
+        locationName = await getLocationName(victimData.latlng);
+      }
       if (sampleVictim) {
         setVictim({
           profilePicture: require("@assets/lego.png"),
@@ -71,7 +75,7 @@ const VictimDetail = ({
             latitude: victimData.latlng.latitude,
             longitude: victimData.latlng.longitude,
           },
-          locationName: await getLocationName(victimData.latlng),
+          locationName,
         });
       } else {
         const userDoc = doc(db, "users", victimData.id);
@@ -88,7 +92,7 @@ const VictimDetail = ({
             latitude: victimData.latlng.latitude,
             longitude: victimData.latlng.longitude,
           },
-          locationName: await getLocationName(victimData.latlng),
+          locationName,
         });
       }
     }
