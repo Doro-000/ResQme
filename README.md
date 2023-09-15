@@ -55,7 +55,6 @@ OR
 # Authors
 
 - [@Doro-000](https://github.com/Doro-000)
-- [@UncrownedKing1](https://github.com/UncrownedKing1)
 
 
 Made with ❤️ in Bremen<br />
