@@ -12,7 +12,7 @@ This aggregated data inturn provides Search and Rescue Teams With heat/density m
 
 During the above mentioned earthquake were unavailable due to high amount of callers. Our Application is Built on top of Firebase, to guarantee high availabilty as user traffic increases.
 
-It also features an [API](https://resqme.me/) for data consumption by other services.
+It also features an [API](https://github.com/Doro-000/ResQme/tree/main/functions) for data consumption by other services.
 
 # Tech Stack
 
